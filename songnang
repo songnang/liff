@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LINE Profile</title>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<style>
+body { font-family: Arial; text-align:center; padding:30px; }
+img { border-radius:50%; margin-top:15px; }
+</style>
+</head>
+
+<body>
+<h2>LINE Profile</h2>
+<div id="status">กำลังโหลด...</div>
+
+<div id="profile" style="display:none;">
+<p id="name"></p>
+<p id="userid"></p>
+<img id="picture" width="120">
+</div>
+
+<script>
+window.onload = async function () {
+
+  const status = document.getElementById("status");
+
+  try {
+
+    await liff.init({
+      liffId: "2009167624-uNkAjUGQ",
+      withLoginOnExternalBrowser: true
+    });
+
+    if (!liff.isLoggedIn()) {
+      liff.login();
+      return;
+    }
+
+    const profile = await liff.getProfile();
+
+    document.getElementById("name").innerText =
+      "ชื่อ: " + profile.displayName;
+
+    document.getElementById("userid").innerText =
+      "LINE ID: " + profile.userId;
+
+    if (profile.pictureUrl) {
+      document.getElementById("picture").src =
+        profile.pictureUrl;
+    }
+
+    document.getElementById("profile").style.display = "block";
+    status.innerText = "โหลดสำเร็จ";
+
+  } catch (err) {
+    status.innerText = "ERROR: " + err.message;
+  }
+};
+</script>
+
+</body>
+</html>
