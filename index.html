@@ -1,64 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LINE Profile</title>
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<style>
-body { font-family: Arial; text-align:center; padding:30px; }
-img { border-radius:50%; margin-top:15px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>กำลังโหลดร้านค้า...</title>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background-color: #fcf3eb; }
+        #loading {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            flex-direction: column; font-family: sans-serif; color: #d35400;
+        }
+        iframe { width: 100%; height: 100%; border: none; display: none; }
+    </style>
 </head>
-
 <body>
-<h2>LINE Profile</h2>
-<div id="status">กำลังโหลด...</div>
 
-<div id="profile" style="display:none;">
-<p id="name"></p>
-<p id="userid"></p>
-<img id="picture" width="120">
-</div>
+    <div id="loading">
+        <div style="font-size: 2em;">🧁</div>
+        <p>กำลังเข้าสู่ร้านขนมคุณยาย...</p>
+    </div>
 
-<script>
-window.onload = async function () {
+    <!-- Iframe จะถูกสร้างที่นี่ -->
+    <iframe id="shop-frame"></iframe>
 
-  const status = document.getElementById("status");
+    <script>
+        // 🔴 1. ใส่ LIFF ID ของคุณที่นี่
+        const MY_LIFF_ID = "2009156099-XkhIO3sS"; 
+        
+        // 🔴 2. ใส่ลิงก์ Google Script Web App (/exec) ของคุณที่นี่
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwT7uP7g2-cet37Oha_ycNqkcQw5_NDsYRU5k0GGKNBd4oqGx12iZUUsyT_TlW18VU/exec"; 
 
-  try {
+        async function main() {
+            const frame = document.getElementById('shop-frame');
+            const loading = document.getElementById('loading');
 
-    await liff.init({
-      liffId: "2009167624-uNkAjUGQ",
-      withLoginOnExternalBrowser: true
-    });
+            try {
+                // เริ่มต้น LIFF
+                await liff.init({ liffId: MY_LIFF_ID });
 
-    if (!liff.isLoggedIn()) {
-      liff.login();
-      return;
-    }
+                if (!liff.isLoggedIn()) {
+                    liff.login(); // ถ้ายังไม่ล็อกอิน ให้เด้งไปล็อกอินทันที
+                    return;
+                }
 
-    const profile = await liff.getProfile();
+                // ดึงข้อมูลโปรไฟล์
+                const profile = await liff.getProfile();
+                const name = encodeURIComponent(profile.displayName);
+                const uid = encodeURIComponent(profile.userId);
+                // LIFF ID ไม่มีให้ดึง (Privacy) เราจะใช้ DisplayName ใส่แทน
+                const lineid = encodeURIComponent(profile.displayName); 
 
-    document.getElementById("name").innerText =
-      "ชื่อ: " + profile.displayName;
+                // สร้าง URL พร้อมส่งค่าไปให้ Google Script
+                // เช่น .../exec?cust_name=Somchai&cust_lineid=Somchai
+                const finalUrl = `${WEB_APP_URL}?name=${name}&lineid=${lineid}&uid=${uid}`;
 
-    document.getElementById("userid").innerText =
-      "LINE ID: " + profile.userId;
+                // โหลด Iframe
+                frame.src = finalUrl;
+                
+                // เมื่อ Iframe โหลดเสร็จ ให้โชว์
+                frame.onload = () => {
+                    loading.style.display = 'none';
+                    frame.style.display = 'block';
+                };
 
-    if (profile.pictureUrl) {
-      document.getElementById("picture").src =
-        profile.pictureUrl;
-    }
+            } catch (err) {
+                // กรณี LIFF พัง หรือเปิดนอก LINE ให้โหลดเว็บปกติไปเลย (ไม่ส่งชื่อ)
+                console.error(err);
+                alert("ไม่สามารถเชื่อมต่อ LINE ได้ กำลังเข้าสู่โหมดปกติ");
+                frame.src = WEB_APP_URL;
+                loading.style.display = 'none';
+                frame.style.display = 'block';
+            }
+        }
 
-    document.getElementById("profile").style.display = "block";
-    status.innerText = "โหลดสำเร็จ";
-
-  } catch (err) {
-    status.innerText = "ERROR: " + err.message;
-  }
-};
-</script>
-
+        main();
+    </script>
 </body>
 </html>
