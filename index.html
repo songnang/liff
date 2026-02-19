@@ -28,7 +28,8 @@
         const MY_LIFF_ID = "2009156099-XkhIO3sS"; 
         
         // 🔴 2. ใส่ลิงก์ Google Script Web App (/exec) ของท่านที่นี่
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwT7uP7g2-cet37Oha_ycNqkcQw5_NDsYRU5k0GGKNBd4oqGx12iZUUsyT_TlW18VU/exec"; 
+        // .trim() ช่วยตัดช่องว่างหน้าหลังที่อาจเผลอติดมา
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwT7uP7g2-cet37Oha_ycNqkcQw5_NDsYRU5k0GGKNBd4oqGx12iZUUsyT_TlW18VU/exec".trim(); 
 
         async function main() {
             const status = document.getElementById('status');
@@ -55,8 +56,8 @@
                 const name = profile.displayName;
                 const uid = profile.userId;
                 
-                // 🛑 DEBUG: แจ้งเตือนออกมาดูว่าได้ค่าไหม (ถ้าเห็น Popup นี้แสดงว่า LIFF ผ่าน)
-                alert("ดึงข้อมูลสำเร็จ!\nชื่อ: " + name + "\nUID: " + uid);
+                // ✅ ดึงข้อมูลสำเร็จแล้ว (ปิด Alert เพื่อให้ระบบไหลลื่น)
+                console.log("LIFF Data:", name, uid); 
 
                 status.innerText = "กำลังเข้าสู่ร้านขนมเทียนสองนาง...";
 
