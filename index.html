@@ -3,75 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>กำลังโหลดร้านค้า...</title>
+    <title>กำลังโหลด...</title>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background-color: #fcf3eb; }
-        #loading {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; justify-content: center; align-items: center;
-            flex-direction: column; font-family: sans-serif; color: #d35400;
-        }
-        iframe { width: 100%; height: 100%; border: none; display: none; }
+        body { font-family: sans-serif; text-align: center; padding: 20px; background-color: #fcf3eb; }
+        #status { margin-bottom: 20px; color: #d35400; font-weight: bold; }
+        iframe { width: 100%; height: 100vh; border: none; display: none; }
+        button { padding: 10px 20px; background: #00c300; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; display: none; }
     </style>
 </head>
 <body>
 
     <div id="loading">
-        <div style="font-size: 2em;">🧁</div>
-        <p>กำลังเข้าสู่ร้านขนมเทียนสองนาง...</p>
+        <div style="font-size: 3em;">🔍</div>
+        <p id="status">กำลังเชื่อมต่อ LINE...</p>
+        <button id="loginBtn" onclick="liff.login()">เข้าสู่ระบบ LINE</button>
     </div>
 
-    <!-- Iframe จะถูกสร้างที่นี่ -->
+    <!-- Iframe ร้านขนม -->
     <iframe id="shop-frame"></iframe>
 
     <script>
-        // 🔴 1. ใส่ LIFF ID ของคุณที่นี่
+        // 🔴 1. ใส่ LIFF ID ของท่านที่นี่
         const MY_LIFF_ID = "2009156099-XkhIO3sS"; 
         
-        // 🔴 2. ใส่ลิงก์ Google Script Web App (/exec) ของคุณที่นี่
+        // 🔴 2. ใส่ลิงก์ Google Script Web App (/exec) ของท่านที่นี่
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwT7uP7g2-cet37Oha_ycNqkcQw5_NDsYRU5k0GGKNBd4oqGx12iZUUsyT_TlW18VU/exec"; 
 
         async function main() {
+            const status = document.getElementById('status');
             const frame = document.getElementById('shop-frame');
             const loading = document.getElementById('loading');
+            const loginBtn = document.getElementById('loginBtn');
 
             try {
-                // เริ่มต้น LIFF
+                // 1. เริ่มต้น LIFF
                 await liff.init({ liffId: MY_LIFF_ID });
 
+                // 2. เช็คว่าล็อกอินหรือยัง
                 if (!liff.isLoggedIn()) {
-                    liff.login(); // ถ้ายังไม่ล็อกอิน ให้เด้งไปล็อกอินทันที
+                    status.innerText = "ท่านยังไม่ได้เข้าสู่ระบบ LINE";
+                    status.style.color = "red";
+                    loginBtn.style.display = "inline-block"; // โชว์ปุ่มให้กดเอง
                     return;
                 }
 
-                // ดึงข้อมูลโปรไฟล์
+                status.innerText = "เข้าสู่ระบบสำเร็จ! กำลังดึงข้อมูล...";
+
+                // 3. ดึงข้อมูลโปรไฟล์
                 const profile = await liff.getProfile();
-                const name = encodeURIComponent(profile.displayName);
-                const uid = encodeURIComponent(profile.userId);
-                // LIFF ID ไม่มีให้ดึง (Privacy) เราจะใช้ DisplayName ใส่แทน
-                const lineid = encodeURIComponent(profile.displayName); 
+                const name = profile.displayName;
+                const uid = profile.userId;
+                
+                // 🛑 DEBUG: แจ้งเตือนออกมาดูว่าได้ค่าไหม (ถ้าเห็น Popup นี้แสดงว่า LIFF ผ่าน)
+                alert("ดึงข้อมูลสำเร็จ!\nชื่อ: " + name + "\nUID: " + uid);
 
-                // สร้าง URL พร้อมส่งค่าไปให้ Google Script
-                // เช่น .../exec?cust_name=Somchai&cust_lineid=Somchai
-                const finalUrl = `${WEB_APP_URL}?name=${name}&lineid=${lineid}&uid=${uid}`;
+                status.innerText = "กำลังเข้าสู่ร้านขนมเทียนสองนาง...";
 
-                // โหลด Iframe
+                // 4. สร้าง URL ส่งไป Google Script
+                // ใช้ encodeURIComponent เพื่อป้องกันชื่อที่มีอักขระพิเศษทำลิงก์พัง
+                const finalUrl = `${WEB_APP_URL}?name=${encodeURIComponent(name)}&lineid=${encodeURIComponent(name)}&uid=${encodeURIComponent(uid)}`;
+
+                // 5. โหลด Iframe
                 frame.src = finalUrl;
                 
-                // เมื่อ Iframe โหลดเสร็จ ให้โชว์
                 frame.onload = () => {
                     loading.style.display = 'none';
                     frame.style.display = 'block';
                 };
 
             } catch (err) {
-                // กรณี LIFF พัง หรือเปิดนอก LINE ให้โหลดเว็บปกติไปเลย (ไม่ส่งชื่อ)
-                console.error(err);
-                alert("ไม่สามารถเชื่อมต่อ LINE ได้ กำลังเข้าสู่โหมดปกติ");
+                // ถ้า Error ตรงนี้ แสดงว่า LIFF ตั้งค่าผิด หรือ URL ผิด
+                alert("เกิดข้อผิดพลาด: " + err.message + "\n(Code: " + err.code + ")");
+                
+                // Fallback: โหลดเว็บแบบไม่ส่งค่า
+                status.innerText = "กำลังเข้าสู่โหมดปกติ (ไม่ระบุตัวตน)...";
                 frame.src = WEB_APP_URL;
-                loading.style.display = 'none';
-                frame.style.display = 'block';
+                setTimeout(() => {
+                    loading.style.display = 'none';
+                    frame.style.display = 'block';
+                }, 1000);
             }
         }
 
