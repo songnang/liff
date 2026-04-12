@@ -29,7 +29,7 @@
 
   <nav class="navbar navbar-expand-lg navbar-dark p-3">
     <div class="container-fluid">
-      <a class="navbar-brand fw-bold" href="#"><i class="fas fa-store"></i> ร้านขนมเทียนสองนาง V 1.00</a>
+      <a class="navbar-brand fw-bold" href="#"><i class="fas fa-store"></i> ร้านขนมเทียนสองนาง V 1.02</a>
       <span class="text-white"><i class="fas fa-calendar-alt"></i> ออเดอร์ตั้งแต่วันนี้</span>
     </div>
   </nav>
@@ -99,20 +99,32 @@
     function loadData() {
       document.getElementById('table-body').innerHTML = '<tr><td colspan="10" class="text-center py-4"><div class="spinner-border text-warning" role="status"></div> กำลังโหลดข้อมูล...</td></tr>';
       
-      google.script.run.withSuccessHandler(renderTable).withFailureHandler(err => {
-        Swal.fire('ข้อผิดพลาด', err.message, 'error');
-      }).getDashboardData();
+      // 🟢 อัปเดตระบบรับการแจ้งเตือน Error
+      google.script.run
+        .withSuccessHandler(res => {
+          if (res.status === 'success') {
+            renderTable(res.data);
+          } else {
+            // ถ้า Error จากโค้ดหลังบ้าน
+            document.getElementById('table-body').innerHTML = `<tr><td colspan="10" class="text-center text-danger py-4 fw-bold">❌ เกิดข้อผิดพลาดใน Sheet: <br><span class="text-muted small">${res.message}</span></td></tr>`;
+          }
+        })
+        .withFailureHandler(err => {
+          // ถ้า Error จากการเชื่อมต่อ หรือ หาฟังก์ชันไม่เจอ
+          document.getElementById('table-body').innerHTML = `<tr><td colspan="10" class="text-center text-danger py-4 fw-bold">❌ ไม่สามารถดึงข้อมูลได้ <br><span class="text-muted small">โปรดตรวจสอบให้แน่ใจว่าคุณได้กด Deploy -> New version แล้ว<br>(${err.message})</span></td></tr>`;
+        })
+        .getDashboardData();
     }
 
     function renderTable(data) {
       globalOrders = data;
       let html = '';
       if(data.length === 0) {
-        html = '<tr><td colspan="10" class="text-center text-muted py-4">ไม่มีออเดอร์ค้างส่งตั้งแต่วันนี้</td></tr>';
+        html = '<tr><td colspan="10" class="text-center text-muted py-4">ไม่มีออเดอร์ค้างส่งตั้งแต่วันนี้เป็นต้นไป</td></tr>';
       } else {
         data.forEach((row, index) => {
           let paidIcon = row.isPaid === "TRUE" ? '<i class="fas fa-check-circle text-success"></i>' : '<i class="far fa-circle text-muted"></i>';
-          let statusClass = row.payment.includes('ยืนยัน') ? 'status-paid' : 'status-wait';
+          let statusClass = String(row.payment).includes('ยืนยัน') ? 'status-paid' : 'status-wait';
           
           html += `
             <tr>
