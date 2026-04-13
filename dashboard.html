@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📦 ร้านขนมเทียนสองนาง 1.01</title>
+  <title>📦 ร้านขนมเทียนสองนาง 1.02</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
@@ -234,34 +234,42 @@
       }
     }
 
-// 🟢 ฟังก์ชันพิมพ์บิลแบบใหม่ (เปิดแท็บใหม่ไปที่ Apps Script)
+// 🟢 ฟังก์ชันสั่งพิมพ์แบบใหม่ (รองรับทั้งมือถือและคอมพิวเตอร์)
     function printOrder(index) {
       const orderData = globalOrders[index];
       
-      // สร้าง URL ไปยัง Apps Script พร้อมแนบเลขแถว (Row)
+      // ดึงลิงก์ฟอร์แมตบิลจากไฟล์ Print.html ของ Google Apps Script โดยตรง
       const printUrl = WEB_APP_URL + "?page=print&row=" + orderData.rowIndex;
 
-      // ปิด Modal หน้าต่างรายละเอียดลงก่อน เพื่อไม่ให้บังหน้าจอ
+      // ปิด Modal รายละเอียดก่อน
       detailModal.hide();
 
-      Swal.fire({
-        title: 'กำลังเปิดหน้าใบสั่งซื้อ...',
-        text: 'ระบบกำลังเปิดแท็บใหม่เพื่อสั่งพิมพ์',
-        icon: 'info',
-        timer: 1500,
-        showConfirmButton: false
-      });
+      // ตรวจสอบว่าเป็นมือถือหรือไม่
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-      // ใช้วิธีจำลองการคลิกลิงก์ เพื่อแก้ปัญหาเบราว์เซอร์มือถือบล็อก Popup
-      setTimeout(() => {
-        const link = document.createElement('a');
-        link.href = printUrl;
-        link.target = '_blank'; // เปิดแท็บใหม่
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }, 500);
-    }    
+      if (isMobile) {
+        // 📱 สำหรับมือถือ: เปลี่ยนหน้าต่างไปยังลิงก์ใบเสร็จโดยตรง (ไม่โดนบล็อก 100%)
+        // เมื่อดูเสร็จ แอดมินสามารถกด "ย้อนกลับ (Back)" กลับมาที่ Dashboard ได้เลย
+        Swal.fire({
+          title: 'กำลังเปิดแบบฟอร์ม...',
+          html: 'ระบบกำลังพาคุณไปยังหน้าใบสั่งซื้อ<br><br><span class="text-danger fw-bold" style="font-size: 0.9em;">*เมื่อตรวจสอบเสร็จ ให้กดปุ่ม "ย้อนกลับ"<br>ของมือถือ เพื่อกลับมาหน้า Dashboard นะครับ</span>',
+          icon: 'info',
+          timer: 2500,
+          showConfirmButton: false
+        }).then(() => {
+          window.location.href = printUrl; 
+        });
+      } else {
+        // 💻 สำหรับคอมพิวเตอร์: เปิดแท็บใหม่ได้ปกติ
+        Swal.fire({
+          title: 'กำลังเตรียมเอกสาร...',
+          icon: 'success',
+          timer: 1000,
+          showConfirmButton: false
+        });
+        window.open(printUrl, '_blank');
+      }
+    } 
     
   </script>
 </body>
