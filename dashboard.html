@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📦 ร้านขนมเทียนสองนาง 1.02</title>
+  <title>📦 ร้านขนมเทียนสองนาง 1.03</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
@@ -15,14 +15,6 @@
     .status-paid { color: #28a745; font-weight: bold; }
     .status-wait { color: #ffc107; font-weight: bold; }
     .btn-detail { background-color: #0288d1; color: white; border: none; border-radius: 20px; padding: 5px 15px; font-size: 0.85em; transition: 0.3s; }
-    
-    /* 🟢 สไตล์ซ่อน UI ทั้งหมดเวลาสั่งพิมพ์ ให้โชว์แค่บิลเท่านั้น */
-    @media print {
-      body > :not(#print-area) { display: none !important; }
-      #print-area { display: block !important; width: 100%; margin: 0; padding: 0; background: white; }
-      @page { size: A4 portrait; margin: 0; }
-    }
-    #print-area { display: none; }
   </style>
 </head>
 <body>
@@ -30,7 +22,7 @@
   <div id="main-content">
     <nav class="navbar navbar-expand-lg navbar-dark p-3">
       <div class="container-fluid">
-        <a class="navbar-brand fw-bold" href="#"><i class="fas fa-store"></i> ร้านขนมเทียนสองนาง 1.02</a>
+        <a class="navbar-brand fw-bold" href="#"><i class="fas fa-store"></i> ร้านขนมเทียนสองนาง 1.03</a>
         <span class="text-white"><i class="fas fa-calendar-alt"></i> ออเดอร์ตั้งแต่วันนี้</span>
       </div>
     </nav>
@@ -83,8 +75,6 @@
     </div>
   </div>
 
-  <div id="print-area"></div>
-
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
@@ -98,7 +88,7 @@
 
     window.onload = loadData;
 
-    // 🟢 ระบบดึงข้อมูลจาก Google Apps Script ผ่าน Fetch API
+    // ระบบดึงข้อมูลจาก Google Apps Script ผ่าน Fetch API
     async function loadData() {
       const tbody = document.getElementById('table-body');
       tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4"><div class="spinner-border text-warning"></div> กำลังโหลดข้อมูล...</td></tr>';
@@ -106,7 +96,7 @@
       try {
         const response = await fetch(WEB_APP_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // ป้องกันปัญหา CORS
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: 'getDashboardData' })
         });
         
@@ -118,7 +108,7 @@
           tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger py-4 fw-bold">❌ Error: ${res.message}</td></tr>`;
         }
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger py-4 fw-bold">❌ ไม่สามารถเชื่อมต่อกับฐานข้อมูลได้ (${err.message})<br><small class="text-muted">โปรดตรวจสอบ Web App URL หรือเปิดการเชื่อมต่ออินเทอร์เน็ต</small></td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger py-4 fw-bold">❌ ไม่สามารถเชื่อมต่อกับฐานข้อมูลได้ (${err.message})<br><small class="text-muted">โปรดตรวจสอบ Web App URL</small></td></tr>`;
       }
     }
 
@@ -194,8 +184,24 @@
       `;
 
       document.getElementById('modal-content').innerHTML = contentHtml;
+      
+      // 🟢 ตรวจจับอุปกรณ์ว่าเป็นมือถือหรือไม่
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const btnPrint = document.getElementById('btn-print');
+
+      if (isMobile) {
+        // ถ้าเป็นมือถือ ให้ Disable ปุ่ม
+        btnPrint.disabled = true;
+        btnPrint.innerHTML = '<i class="fas fa-print"></i> พิมพ์ใบสั่งซื้อ (ใช้ PC)';
+        btnPrint.onclick = null;
+      } else {
+        // ถ้าเป็น PC ให้กดได้ปกติ
+        btnPrint.disabled = false;
+        btnPrint.innerHTML = '<i class="fas fa-print"></i> พิมพ์ใบสั่งซื้อ';
+        btnPrint.onclick = () => printOrder(index);
+      }
+
       document.getElementById('btn-reconfirm').onclick = () => sendReconfirm(order.rowIndex);
-      document.getElementById('btn-print').onclick = () => printOrder(index);
 
       detailModal.show();
     }
@@ -234,43 +240,23 @@
       }
     }
 
-// 🟢 ฟังก์ชันสั่งพิมพ์แบบใหม่ (รองรับทั้งมือถือและคอมพิวเตอร์)
+    // 🟢 ฟังก์ชันสั่งพิมพ์ (จะถูกเรียกใช้เฉพาะบน PC เท่านั้น)
     function printOrder(index) {
       const orderData = globalOrders[index];
-      
-      // ดึงลิงก์ฟอร์แมตบิลจากไฟล์ Print.html ของ Google Apps Script โดยตรง
       const printUrl = WEB_APP_URL + "?page=print&row=" + orderData.rowIndex;
 
-      // ปิด Modal รายละเอียดก่อน
       detailModal.hide();
 
-      // ตรวจสอบว่าเป็นมือถือหรือไม่
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-      if (isMobile) {
-        // 📱 สำหรับมือถือ: เปลี่ยนหน้าต่างไปยังลิงก์ใบเสร็จโดยตรง (ไม่โดนบล็อก 100%)
-        // เมื่อดูเสร็จ แอดมินสามารถกด "ย้อนกลับ (Back)" กลับมาที่ Dashboard ได้เลย
-        Swal.fire({
-          title: 'กำลังเปิดแบบฟอร์ม...',
-          html: 'ระบบกำลังพาคุณไปยังหน้าใบสั่งซื้อ<br><br><span class="text-danger fw-bold" style="font-size: 0.9em;">*เมื่อตรวจสอบเสร็จ ให้กดปุ่ม "ย้อนกลับ"<br>ของมือถือ เพื่อกลับมาหน้า Dashboard นะครับ</span>',
-          icon: 'info',
-          timer: 2500,
-          showConfirmButton: false
-        }).then(() => {
-          window.location.href = printUrl; 
-        });
-      } else {
-        // 💻 สำหรับคอมพิวเตอร์: เปิดแท็บใหม่ได้ปกติ
-        Swal.fire({
-          title: 'กำลังเตรียมเอกสาร...',
-          icon: 'success',
-          timer: 1000,
-          showConfirmButton: false
-        });
-        window.open(printUrl, '_blank');
-      }
-    } 
-    
+      Swal.fire({
+        title: 'กำลังเปิดหน้าใบสั่งซื้อ...',
+        icon: 'success',
+        timer: 1000,
+        showConfirmButton: false
+      });
+      
+      // เปิดแท็บใหม่ไปที่หน้าพิมพ์ของ Apps Script
+      window.open(printUrl, '_blank');
+    }
   </script>
 </body>
 </html>
