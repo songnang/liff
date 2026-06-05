@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📖 คู่มือการใช้งานระบบ - ร้านขนมเทียนสองนาง</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body { 
+      background-color: #fcf3eb; 
+      font-family: 'Sarabun', sans-serif; 
+      color: #333;
+      line-height: 1.6;
+    }
+    .navbar { 
+      background-color: #d35400; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+    }
+    .hero-section {
+      background: linear-gradient(135deg, #ffcc80 0%, #ffab40 100%);
+      color: #fff;
+      padding: 40px 20px;
+      text-align: center;
+      border-radius: 0 0 30px 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .hero-section h1 { font-weight: 700; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+    
+    .toc-card {
+      background-color: #fff;
+      border-left: 5px solid #d35400;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 20px;
+    }
+    .toc-link {
+      color: #555;
+      text-decoration: none;
+      display: block;
+      padding: 8px 15px;
+      border-radius: 5px;
+      transition: 0.3s;
+      font-weight: 500;
+    }
+    .toc-link:hover {
+      background-color: #ffe0b2;
+      color: #d35400;
+    }
+    
+    .manual-section {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+      margin-bottom: 30px;
+    }
+    .manual-section h2 {
+      color: #d35400;
+      font-weight: 700;
+      border-bottom: 2px solid #ffe0b2;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .manual-section h4 { color: #e67e22; font-weight: 700; margin-top: 25px; }
+    
+    .code-box {
+      background-color: #282c34;
+      color: #abb2bf;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.95em;
+      overflow-x: auto;
+    }
+    .highlight { color: #e5c07b; }
+    .string { color: #98c379; }
+    .keyword { color: #c678dd; }
+
+    .alert-custom {
+      background-color: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-dark sticky-top">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="#">
+        <i class="fas fa-book-open"></i> คู่มือระบบร้านขนมเทียนสองนาง
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero-section">
+    <h1><i class="fas fa-chalkboard-teacher"></i> ศูนย์ช่วยเหลือและคู่มือการใช้งาน</h1>
+    <p class="fs-5 mb-0">ครอบคลุมทั้งระบบแอดมิน ระบบลูกค้า และการตั้งค่าเมนูสินค้า</p>
+  </div>
+
+  <div class="container pb-5">
+    <div class="row">
+      
+      <!-- เมนูด้านซ้าย (สารบัญ) -->
+      <div class="col-lg-3 mb-4 d-none d-lg-block">
+        <div class="toc-card p-3">
+          <h5 class="fw-bold mb-3 text-dark"><i class="fas fa-list"></i> สารบัญ</h5>
+          <a href="#admin-dashboard" class="toc-link"><i class="fas fa-desktop"></i> 1. ระบบ Dashboard</a>
+          <a href="#customer-web" class="toc-link"><i class="fas fa-mobile-alt"></i> 2. ระบบลูกค้า (หน้าสั่งซื้อ)</a>
+          <a href="#menu-config" class="toc-link"><i class="fas fa-cogs"></i> 3. การตั้งค่าหน้าเมนู</a>
+        </div>
+      </div>
+
+      <!-- เนื้อหาคู่มือ -->
+      <div class="col-lg-9">
+
+        <!-- ======================================= -->
+        <!-- ส่วนที่ 1: แอดมิน Dashboard -->
+        <!-- ======================================= -->
+        <div id="admin-dashboard" class="manual-section">
+          <h2>1. คู่มือการใช้งาน Dashboard (สำหรับแอดมิน)</h2>
+          <p>Dashboard คือหน้าจอหลักสำหรับแอดมิน เพื่อตรวจสอบคิวงาน สั่งพิมพ์ใบเตรียมสินค้า และส่งบิลอัปเดตให้ลูกค้าได้อย่างรวดเร็ว</p>
+          
+          <h4><i class="fas fa-eye"></i> การดูข้อมูลบนตาราง</h4>
+          <ul>
+            <li><strong>การแสดงผล:</strong> ระบบจะแสดงเฉพาะออเดอร์ของ <b>วันนี้เป็นต้นไป</b> (เรียงจากเวลาที่ใกล้จัดส่งที่สุด)</li>
+            <li><strong>การอัปเดตข้อมูล:</strong> หากมีการแก้ไขใน Google Sheets ให้กดปุ่ม <b>"รีเฟรช"</b> ที่มุมขวาบนของตารางเสมอ</li>
+            <li><strong>สถานะออเดอร์:</strong> ตัวหนังสือ <span class="text-warning fw-bold">สีเหลือง</span> คือรอชำระเงิน, ตัวหนังสือ <span class="text-success fw-bold">สีเขียว</span> คือรับยอดแล้ว</li>
+          </ul>
+
+          <h4><i class="fas fa-receipt"></i> การส่งบิลยืนยันใหม่ให้ลูกค้า (Reconfirm)</h4>
+          <p>ใช้เมื่อลูกค้าขอเปลี่ยนจำนวนสินค้า หรือแอดมินบวกค่าจัดส่งเพิ่ม:</p>
+          <ol>
+            <li>แอดมินเข้าไปแก้ตัวเลขจำนวนขนม หรือ ค่าส่ง ในหน้า Google Sheets (Sheet: <code>order</code>)</li>
+            <li>พิมพ์เหตุผลในคอลัมน์ <b>"note" (คอลัมน์ O)</b> เช่น <i>"เพิ่มข้าวต้มมัด 2 ชิ้น"</i> (ข้อความนี้จะโชว์ให้ลูกค้าเห็น)</li>
+            <li>กลับมาที่หน้า Dashboard กดปุ่ม "รีเฟรช" 1 ครั้ง</li>
+            <li>กดเปิดออเดอร์นั้น แล้วคลิกปุ่ม <b><span class="text-primary">ส่งบิลยืนยันใหม่</span></b> ระบบจะคำนวณยอดและยิงใบเสร็จเข้า LINE ลูกค้าทันที</li>
+          </ol>
+
+          <h4><i class="fas fa-print"></i> การพิมพ์ใบสั่งซื้อ</h4>
+          <p>เปิดออเดอร์ที่ต้องการ แล้วกดปุ่ม <b><span class="text-success">พิมพ์ใบสั่งซื้อ</span></b> ระบบจะเปิดหน้ากระดาษ A4 ที่มีรอยตัด (แบ่งส่วนร้านค้า-ลูกค้า) ให้ทันที</p>
+          <div class="alert-custom">
+            <strong>⚠️ หมายเหตุสำคัญ:</strong> ปุ่มสั่งพิมพ์จะเปิดให้กดได้เฉพาะเมื่อใช้งานบน <b>คอมพิวเตอร์ (PC)</b> เท่านั้น หากเปิดบนมือถือปุ่มจะกลายเป็นสีเทาเพื่อป้องกันปัญหาระบบของมือถือบล็อกหน้าต่าง
+          </div>
+        </div>
+
+        <!-- ======================================= -->
+        <!-- ส่วนที่ 2: หน้าเว็บลูกค้า -->
+        <!-- ======================================= -->
+        <div id="customer-web" class="manual-section">
+          <h2>2. คู่มือหน้าเว็บสั่งซื้อ (สำหรับลูกค้า)</h2>
+          <p>หน้าเว็บที่ถูกออกแบบมาเพื่อความง่าย รวดเร็ว และลดภาระการตอบแชทของแอดมิน</p>
+          
+          <h4><i class="fas fa-shopping-basket"></i> การเลือกสินค้าและเงื่อนไข</h4>
+          <ul>
+            <li>กดปุ่ม + หรือ - เพื่อเพิ่มลดจำนวนสินค้า ยอดเงินจะคำนวณแบบ Real-time ที่แถบด้านล่าง</li>
+            <li><strong>เงื่อนไขขนมเข่ง:</strong> หากสั่งขนมเข่ง (ธรรมดา/มะพร้าว) ระบบจะบังคับให้สั่งรวมกันขั้นต่ำ 30 คู่ หากไม่ถึงเกณฑ์ ปุ่มกดยืนยันจะถูกล็อก</li>
+          </ul>
+
+          <h4><i class="fas fa-truck"></i> ระบบจัดส่งและการคำนวณค่าส่ง</h4>
+          <ul>
+            <li><strong>EMS (ปณ.ไทย):</strong> ระบบจะคำนวณค่ากล่อง (10-20 บ.) และค่าส่งตามน้ำหนักจริงให้อัตโนมัติ <i>(หมายเหตุ: ข้าวต้มมัดและบะจ่าง จะไม่สามารถส่ง EMS ได้)</i></li>
+            <li><strong>Lineman / Grab / Lalamove:</strong> ระบบจะเปิดช่องให้ <b>"ระบุค่าจัดส่งตามแอป"</b> หากเก็บเงินปลายทางให้ลูกค้าพิมพ์ <code>0</code> ลงไป</li>
+          </ul>
+
+          <h4><i class="fas fa-user-check"></i> ระบบจดจำลูกค้าเก่า</h4>
+          <p>เมื่อลูกค้ากรอกเบอร์โทรศัพท์เสร็จ ระบบจะเติมขีด (-) ให้อัตโนมัติ และจะทำการค้นหาเบอร์จากฐานข้อมูล หากเป็นลูกค้าเก่า ระบบจะดึง "ชื่อ" และ "ที่อยู่" เดิมมาเติมให้ทันทีโดยไม่ต้องพิมพ์ใหม่</p>
+        </div>
+
+        <!-- ======================================= -->
+        <!-- ส่วนที่ 3: การตั้งค่าเมนู -->
+        <!-- ======================================= -->
+        <div id="menu-config" class="manual-section">
+          <h2>3. คู่มือการตั้งค่าหน้าเมนู (สำหรับผู้ดูแลระบบ)</h2>
+          <p>หากต้องการปรับเปลี่ยนราคา ซ่อนสินค้า หรือแจ้งว่าสินค้าหมด ให้ทำการแก้ไขโค้ดในไฟล์ <code>Index.html</code> ที่อยู่บน GitHub</p>
+
+          <h4><i class="fas fa-search"></i> ตำแหน่งที่ต้องแก้ไข</h4>
+          <p>เปิดไฟล์ <code>Index.html</code> เลื่อนลงมาประมาณบรรทัดที่ 180 จะพบตัวแปรที่ชื่อว่า <code>const products = [...]</code> ดังภาพ:</p>
+          
+          <div class="code-box">
+            <span class="keyword">const</span> products = [<br>
+            &nbsp;&nbsp;{ id: <span class="string">'qty_salty'</span>, name: <span class="string">'เทียนเค็ม'</span>, price: <span class="highlight">12</span>, ... isOutOfStock: <span class="keyword">false</span>, isHidden: <span class="keyword">false</span> },<br>
+            &nbsp;&nbsp;{ id: <span class="string">'qty_sweet'</span>, name: <span class="string">'เทียนหวาน'</span>, price: <span class="highlight">12</span>, ... isOutOfStock: <span class="keyword">false</span>, isHidden: <span class="keyword">false</span> },<br>
+            &nbsp;&nbsp;<span class="text-muted">// ... รายการอื่นๆ</span><br>
+            ];
+          </div>
+
+          <h4 class="mt-4"><i class="fas fa-edit"></i> วิธีการปรับแต่ง</h4>
+          <table class="table table-bordered mt-2">
+            <thead class="table-light">
+              <tr>
+                <th width="30%">ความต้องการ</th>
+                <th>วิธีแก้ไขโค้ด</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1. ปรับราคา</strong></td>
+                <td>เปลี่ยนตัวเลขตรง <code>price: 12</code> เป็นราคาใหม่ เช่น <code>price: 15</code></td>
+              </tr>
+              <tr>
+                <td><strong>2. แจ้งว่า "สินค้าหมด"</strong></td>
+                <td>เปลี่ยนคำว่า <code>isOutOfStock: false</code> เป็น <code>isOutOfStock: true</code><br>
+                <i>(หน้าเว็บจะขึ้นแถบสีแดงว่าสินค้าหมด และลูกค้าจะกดปุ่มเพิ่มไม่ได้)</i></td>
+              </tr>
+              <tr>
+                <td><strong>3. ปิด/ซ่อนเมนู</strong></td>
+                <td>เปลี่ยนคำว่า <code>isHidden: false</code> เป็น <code>isHidden: true</code><br>
+                <i>(สินค้านั้นจะหายไปจากหน้าจอเลย)</i></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="alert-custom">
+            <strong>⚠️ ข้อควรระวัง:</strong> ห้ามทำการ <u>เพิ่ม หรือ ลบ</u> แถวรายการสินค้าออกจากโค้ดโดยพลการ หากต้องการนำเมนูออกให้ใช้วิธี <code>isHidden: true</code> แทนเท่านั้น! (หากลบแถวทิ้ง ข้อมูลที่ส่งเข้า Google Sheets จะสลับคอลัมน์และรวนทั้งระบบ)
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
