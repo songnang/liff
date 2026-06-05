@@ -14,84 +14,47 @@
       color: #333;
       line-height: 1.6;
     }
-    .navbar { 
-      background-color: #d35400; 
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-    }
+    .navbar { background-color: #d35400; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     .hero-section {
       background: linear-gradient(135deg, #ffcc80 0%, #ffab40 100%);
-      color: #fff;
-      padding: 40px 20px;
-      text-align: center;
-      border-radius: 0 0 30px 30px;
-      margin-bottom: 30px;
+      color: #fff; padding: 40px 20px; text-align: center;
+      border-radius: 0 0 30px 30px; margin-bottom: 30px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     .hero-section h1 { font-weight: 700; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
     
     .toc-card {
-      background-color: #fff;
-      border-left: 5px solid #d35400;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      position: sticky;
-      top: 20px;
+      background-color: #fff; border-left: 5px solid #d35400;
+      border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      position: sticky; top: 20px;
     }
     .toc-link {
-      color: #555;
-      text-decoration: none;
-      display: block;
-      padding: 8px 15px;
-      border-radius: 5px;
-      transition: 0.3s;
-      font-weight: 500;
+      color: #555; text-decoration: none; display: block;
+      padding: 8px 15px; border-radius: 5px; transition: 0.3s; font-weight: 500;
     }
-    .toc-link:hover {
-      background-color: #ffe0b2;
-      color: #d35400;
-    }
+    .toc-link:hover { background-color: #ffe0b2; color: #d35400; }
     
     .manual-section {
-      background: #fff;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-      margin-bottom: 30px;
+      background: #fff; padding: 30px; border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px;
     }
     .manual-section h2 {
-      color: #d35400;
-      font-weight: 700;
-      border-bottom: 2px solid #ffe0b2;
-      padding-bottom: 10px;
-      margin-bottom: 20px;
+      color: #d35400; font-weight: 700; border-bottom: 2px solid #ffe0b2;
+      padding-bottom: 10px; margin-bottom: 20px;
     }
     .manual-section h4 { color: #e67e22; font-weight: 700; margin-top: 25px; }
-    
-    .code-box {
-      background-color: #282c34;
-      color: #abb2bf;
-      padding: 15px;
-      border-radius: 8px;
-      font-family: monospace;
-      font-size: 0.95em;
-      overflow-x: auto;
-    }
-    .highlight { color: #e5c07b; }
-    .string { color: #98c379; }
-    .keyword { color: #c678dd; }
 
     .alert-custom {
-      background-color: #fff3cd;
-      border-left: 4px solid #ffc107;
-      padding: 15px;
-      border-radius: 5px;
-      margin-top: 15px;
+      background-color: #fff3cd; border-left: 4px solid #ffc107;
+      padding: 15px; border-radius: 5px; margin-top: 15px;
+    }
+    .img-instruction {
+      max-width: 100%; border-radius: 8px; border: 1px solid #eee; margin: 10px 0;
     }
   </style>
 </head>
 <body>
 
-  <!-- Navbar -->
   <nav class="navbar navbar-dark sticky-top">
     <div class="container-fluid">
       <a class="navbar-brand fw-bold" href="#">
@@ -100,7 +63,6 @@
     </div>
   </nav>
 
-  <!-- Hero -->
   <div class="hero-section">
     <h1><i class="fas fa-chalkboard-teacher"></i> ศูนย์ช่วยเหลือและคู่มือการใช้งาน</h1>
     <p class="fs-5 mb-0">ครอบคลุมทั้งระบบแอดมิน ระบบลูกค้า และการตั้งค่าเมนูสินค้า</p>
@@ -109,22 +71,17 @@
   <div class="container pb-5">
     <div class="row">
       
-      <!-- เมนูด้านซ้าย (สารบัญ) -->
       <div class="col-lg-3 mb-4 d-none d-lg-block">
         <div class="toc-card p-3">
           <h5 class="fw-bold mb-3 text-dark"><i class="fas fa-list"></i> สารบัญ</h5>
           <a href="#admin-dashboard" class="toc-link"><i class="fas fa-desktop"></i> 1. ระบบ Dashboard</a>
           <a href="#customer-web" class="toc-link"><i class="fas fa-mobile-alt"></i> 2. ระบบลูกค้า (หน้าสั่งซื้อ)</a>
-          <a href="#menu-config" class="toc-link"><i class="fas fa-cogs"></i> 3. การตั้งค่าหน้าเมนู</a>
+          <a href="#menu-config" class="toc-link"><i class="fas fa-cogs"></i> 3. การตั้งค่าหน้าเมนูสินค้า</a>
         </div>
       </div>
 
-      <!-- เนื้อหาคู่มือ -->
       <div class="col-lg-9">
 
-        <!-- ======================================= -->
-        <!-- ส่วนที่ 1: แอดมิน Dashboard -->
-        <!-- ======================================= -->
         <div id="admin-dashboard" class="manual-section">
           <h2>1. คู่มือการใช้งาน Dashboard (สำหรับแอดมิน)</h2>
           <p>Dashboard คือหน้าจอหลักสำหรับแอดมิน เพื่อตรวจสอบคิวงาน สั่งพิมพ์ใบเตรียมสินค้า และส่งบิลอัปเดตให้ลูกค้าได้อย่างรวดเร็ว</p>
@@ -152,9 +109,6 @@
           </div>
         </div>
 
-        <!-- ======================================= -->
-        <!-- ส่วนที่ 2: หน้าเว็บลูกค้า -->
-        <!-- ======================================= -->
         <div id="customer-web" class="manual-section">
           <h2>2. คู่มือหน้าเว็บสั่งซื้อ (สำหรับลูกค้า)</h2>
           <p>หน้าเว็บที่ถูกออกแบบมาเพื่อความง่าย รวดเร็ว และลดภาระการตอบแชทของแอดมิน</p>
@@ -175,52 +129,56 @@
           <p>เมื่อลูกค้ากรอกเบอร์โทรศัพท์เสร็จ ระบบจะเติมขีด (-) ให้อัตโนมัติ และจะทำการค้นหาเบอร์จากฐานข้อมูล หากเป็นลูกค้าเก่า ระบบจะดึง "ชื่อ" และ "ที่อยู่" เดิมมาเติมให้ทันทีโดยไม่ต้องพิมพ์ใหม่</p>
         </div>
 
-        <!-- ======================================= -->
-        <!-- ส่วนที่ 3: การตั้งค่าเมนู -->
-        <!-- ======================================= -->
         <div id="menu-config" class="manual-section">
-          <h2>3. คู่มือการตั้งค่าหน้าเมนู (สำหรับผู้ดูแลระบบ)</h2>
-          <p>หากต้องการปรับเปลี่ยนราคา ซ่อนสินค้า หรือแจ้งว่าสินค้าหมด ให้ทำการแก้ไขโค้ดในไฟล์ <code>Index.html</code> ที่อยู่บน GitHub</p>
+          <h2>3. คู่มือการตั้งค่าหน้าเมนูสินค้า (สำหรับผู้ดูแลระบบ)</h2>
+          <p>ระบบใหม่ช่วยให้แอดมินสามารถปรับราคาสินค้า แจ้งสินค้าหมด หรือซ่อนเมนูได้ง่ายๆ ผ่านหน้า Dashboard โดยไม่ต้องเข้าไปแก้ไขโค้ดโปรแกรมอีกต่อไป</p>
 
-          <h4><i class="fas fa-search"></i> ตำแหน่งที่ต้องแก้ไข</h4>
-          <p>เปิดไฟล์ <code>Index.html</code> เลื่อนลงมาประมาณบรรทัดที่ 180 จะพบตัวแปรที่ชื่อว่า <code>const products = [...]</code> ดังภาพ:</p>
-          
-          <div class="code-box">
-            <span class="keyword">const</span> products = [<br>
-            &nbsp;&nbsp;{ id: <span class="string">'qty_salty'</span>, name: <span class="string">'เทียนเค็ม'</span>, price: <span class="highlight">12</span>, ... isOutOfStock: <span class="keyword">false</span>, isHidden: <span class="keyword">false</span> },<br>
-            &nbsp;&nbsp;{ id: <span class="string">'qty_sweet'</span>, name: <span class="string">'เทียนหวาน'</span>, price: <span class="highlight">12</span>, ... isOutOfStock: <span class="keyword">false</span>, isHidden: <span class="keyword">false</span> },<br>
-            &nbsp;&nbsp;<span class="text-muted">// ... รายการอื่นๆ</span><br>
-            ];
-          </div>
+          <h4><i class="fas fa-hand-pointer"></i> วิธีเข้าสู่หน้าตั้งค่า</h4>
+          <ol>
+            <li>เปิดหน้า <b>Dashboard</b> ของร้านขึ้นมา</li>
+            <li>ที่แถบเมนูด้านบนตาราง ให้คลิกเลือกแท็บ <b>"ตั้งค่าสินค้า" <i class="fas fa-cogs"></i></b></li>
+            <li>ระบบจะดึงข้อมูลสินค้าทั้งหมดจากฐานข้อมูลมาแสดงในรูปแบบตาราง</li>
+          </ol>
 
-          <h4 class="mt-4"><i class="fas fa-edit"></i> วิธีการปรับแต่ง</h4>
-          <table class="table table-bordered mt-2">
+          <h4><i class="fas fa-sliders-h"></i> การปรับแต่งที่สามารถทำได้</h4>
+          <table class="table table-bordered mt-3">
             <thead class="table-light">
               <tr>
-                <th width="30%">ความต้องการ</th>
-                <th>วิธีแก้ไขโค้ด</th>
+                <th width="35%">การตั้งค่า</th>
+                <th>วิธีทำ และ ผลลัพธ์</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><strong>1. ปรับราคา</strong></td>
-                <td>เปลี่ยนตัวเลขตรง <code>price: 12</code> เป็นราคาใหม่ เช่น <code>price: 15</code></td>
+                <td><strong class="text-primary">1. การปรับราคาสินค้า</strong></td>
+                <td>
+                  คลิกที่ช่องตัวเลขในคอลัมน์ "ราคา" แล้วพิมพ์ราคาใหม่ลงไปได้เลย<br>
+                  <small class="text-muted">เช่น เปลี่ยนราคาบะจ่างจาก 60 เป็น 65 บาท</small>
+                </td>
               </tr>
               <tr>
-                <td><strong>2. แจ้งว่า "สินค้าหมด"</strong></td>
-                <td>เปลี่ยนคำว่า <code>isOutOfStock: false</code> เป็น <code>isOutOfStock: true</code><br>
-                <i>(หน้าเว็บจะขึ้นแถบสีแดงว่าสินค้าหมด และลูกค้าจะกดปุ่มเพิ่มไม่ได้)</i></td>
+                <td><strong class="text-danger">2. แจ้งว่า "สินค้าหมด"</strong></td>
+                <td>
+                  กดเปิดสวิตช์ในคอลัมน์ <b>"สถานะหมด (ปิดรับ)"</b> ให้เป็นสีฟ้า<br>
+                  <small class="text-muted">ผลลัพธ์: ลูกค้ายังเห็นเมนูนี้อยู่ แต่จะขึ้นแถบสีแดงว่า <b>"สินค้าหมดชั่วคราว"</b> และกดสั่งไม่ได้</small>
+                </td>
               </tr>
               <tr>
-                <td><strong>3. ปิด/ซ่อนเมนู</strong></td>
-                <td>เปลี่ยนคำว่า <code>isHidden: false</code> เป็น <code>isHidden: true</code><br>
-                <i>(สินค้านั้นจะหายไปจากหน้าจอเลย)</i></td>
+                <td><strong class="text-secondary">3. ซ่อนเมนูไปเลย</strong></td>
+                <td>
+                  กดเปิดสวิตช์ในคอลัมน์ <b>"ซ่อนเมนู"</b> ให้เป็นสีฟ้า<br>
+                  <small class="text-muted">ผลลัพธ์: เมนูนี้จะหายไปจากหน้าเว็บของลูกค้าโดยสิ้นเชิง (เหมาะสำหรับสินค้าที่เลิกขาย หรือยังไม่เปิดขายช่วงนี้)</small>
+                </td>
               </tr>
             </tbody>
           </table>
 
+          <h4><i class="fas fa-save"></i> การบันทึกข้อมูล</h4>
+          <p>เมื่อแก้ไขข้อมูลเสร็จเรียบร้อยแล้ว ให้กดปุ่ม <b><span class="text-success">"บันทึกการตั้งค่า"</span></b> ที่มุมขวาล่าง ระบบจะทำการบันทึกข้อมูลลงฐานข้อมูล <br>
+          👉 <i>เมื่อลูกค้าเปิดหน้าเว็บสั่งซื้อในครั้งถัดไป จะเห็นราคาและสถานะใหม่ที่คุณเพิ่งเปลี่ยนทันทีครับ!</i></p>
+
           <div class="alert-custom">
-            <strong>⚠️ ข้อควรระวัง:</strong> ห้ามทำการ <u>เพิ่ม หรือ ลบ</u> แถวรายการสินค้าออกจากโค้ดโดยพลการ หากต้องการนำเมนูออกให้ใช้วิธี <code>isHidden: true</code> แทนเท่านั้น! (หากลบแถวทิ้ง ข้อมูลที่ส่งเข้า Google Sheets จะสลับคอลัมน์และรวนทั้งระบบ)
+            <strong>⚠️ ข้อควรระวัง:</strong> การตั้งค่าผ่านหน้านี้ จะเป็นการอัปเดตข้อมูลเดิมที่มีอยู่ หากร้านต้องการ <b>เพิ่มสินค้าชนิดใหม่</b> หรือ <b>ลบสินค้าทิ้งถาวร</b> จะต้องทำการเพิ่มคอลัมน์ใน Google Sheets และอัปเดตโครงสร้างระบบ (กรุณาแจ้งนักพัฒนาเพื่อป้องกันฐานข้อมูลคลาดเคลื่อน)
           </div>
 
         </div>
