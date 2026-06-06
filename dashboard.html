@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📦 ร้านขนมเทียนสองนาง 1.06</title>
+  <title>📦 ร้านขนมเทียนสองนาง 1.07</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
@@ -25,7 +25,7 @@
 
   <nav class="navbar navbar-expand-lg navbar-dark p-3">
     <div class="container-fluid">
-      <a class="navbar-brand fw-bold" href="#"><i class="fas fa-store"></i> ร้านขนมเทียนสองนาง V 1.06</a>
+      <a class="navbar-brand fw-bold" href="#"><i class="fas fa-store"></i> ร้านขนมเทียนสองนาง V 1.07</a>
       <div class="d-flex align-items-center">
         <a href="manual.html" target="_blank" class="btn btn-light btn-sm fw-bold text-danger shadow-sm rounded-pill px-3">
           <i class="fas fa-book"></i> คู่มือการใช้งาน
@@ -42,7 +42,6 @@
     </ul>
 
     <div class="tab-content" id="pills-tabContent">
-      <!-- หน้า 1: รายการสั่งซื้อ -->
       <div class="tab-pane fade show active" id="pills-orders" role="tabpanel">
         <div class="card card-dashboard p-3">
           <div class="d-flex justify-content-between align-items-center mb-3">
@@ -65,7 +64,6 @@
         </div>
       </div>
 
-      <!-- หน้า 2: ยอดเตรียมสินค้า -->
       <div class="tab-pane fade" id="pills-summary" role="tabpanel">
         <div class="card card-dashboard p-4">
           <div class="d-flex justify-content-between align-items-center mb-4">
@@ -78,16 +76,19 @@
           <div class="table-responsive" id="sumorder-table-container">
             <table class="table table-bordered align-middle text-center table-striped">
               <thead class="table-warning border-dark">
-                <tr><th width="15%">เวลาจัดส่ง</th><th>เทียนเค็ม</th><th>เทียนหวาน</th><th>เข่งธรรมดา</th><th>เข่งมะพร้าว</th><th>ข้าวต้มมัด</th><th>บะจ่าง</th></tr>
+                <tr>
+                  <th width="12%">เวลาจัดส่ง</th>
+                  <th width="15%">ช่องทางรับ</th>
+                  <th>เทียนเค็ม</th><th>เทียนหวาน</th><th>เข่งธรรมดา</th><th>เข่งมะพร้าว</th><th>ข้าวต้มมัด</th><th>บะจ่าง</th>
+                </tr>
               </thead>
-              <tbody id="sumorder-body"><tr><td colspan="7" class="text-center py-4 text-muted">กรุณารอโหลดข้อมูล...</td></tr></tbody>
+              <tbody id="sumorder-body"><tr><td colspan="8" class="text-center py-4 text-muted">กรุณารอโหลดข้อมูล...</td></tr></tbody>
             </table>
           </div>
           <div class="text-end mt-2"><button class="btn btn-outline-success btn-sm rounded-pill shadow-sm" onclick="printSumOrder()"><i class="fas fa-print"></i> พิมพ์ยอดเตรียมสินค้า</button></div>
         </div>
       </div>
 
-      <!-- หน้า 3: ตั้งค่าสินค้า -->
       <div class="tab-pane fade" id="pills-products" role="tabpanel">
         <div class="card card-dashboard p-4">
           <h5 class="fw-bold text-dark mb-4"><i class="fas fa-sliders-h text-primary"></i> ปรับแต่งราคาสินค้าและสถานะ</h5>
@@ -105,7 +106,6 @@
     </div>
   </div>
 
-  <!-- Modal รายละเอียดออเดอร์ -->
   <div class="modal fade" id="detailModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow">
@@ -123,7 +123,6 @@
     </div>
   </div>
 
-  <!-- 🟢 Modal สำหรับ "แก้ไขข้อมูล" -->
   <div class="modal fade" id="editModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow">
@@ -133,25 +132,20 @@
         </div>
         <div class="modal-body p-4">
           <form id="editOrderForm">
-            <!-- ข้อมูลลูกค้า -->
             <h6 class="fw-bold text-info border-bottom pb-2">ข้อมูลลูกค้า</h6>
             <div class="row g-2 mb-3">
               <div class="col-md-6"><label class="form-label small text-muted">ชื่อลูกค้า</label><input type="text" class="form-control" id="edit_custName" required></div>
               <div class="col-md-6"><label class="form-label small text-muted">เบอร์โทรศัพท์</label><input type="text" class="form-control" id="edit_phone" required></div>
               <div class="col-md-12"><label class="form-label small text-muted">ที่อยู่ลูกค้า</label><textarea class="form-control" id="edit_custAdd" rows="2"></textarea></div>
             </div>
-
-            <!-- ข้อมูลจัดส่ง -->
             <h6 class="fw-bold text-info border-bottom pb-2">กำหนดการจัดส่ง</h6>
             <div class="row g-2 mb-3">
-              <div class="col-md-4"><label class="form-label small text-muted">วันที่ส่ง</label><input type="text" class="form-control" id="edit_deliverDate" placeholder="วว/ดด/ปปปป"></div>
-              <div class="col-md-4"><label class="form-label small text-muted">เวลาส่ง</label><input type="text" class="form-control" id="edit_deliverTime" placeholder="เช่น 12:00"></div>
+              <div class="col-md-4"><label class="form-label small text-muted">วันที่ส่ง</label><input type="text" class="form-control" id="edit_deliverDate"></div>
+              <div class="col-md-4"><label class="form-label small text-muted">เวลาส่ง</label><input type="text" class="form-control" id="edit_deliverTime"></div>
               <div class="col-md-4"><label class="form-label small text-muted">วิธีรับของ</label><input type="text" class="form-control" id="edit_deliverBy"></div>
               <div class="col-md-4"><label class="form-label small text-muted">สถานะการชำระเงิน</label><input type="text" class="form-control" id="edit_payment"></div>
               <div class="col-md-8"><label class="form-label small text-muted">Note ของร้านค้า</label><input type="text" class="form-control" id="edit_note"></div>
             </div>
-
-            <!-- จำนวนสินค้า -->
             <h6 class="fw-bold text-info border-bottom pb-2">จำนวนสินค้า (ชิ้น/คู่)</h6>
             <div class="row g-2 mb-3">
               <div class="col-4"><label class="form-label small text-muted">เทียนเค็ม</label><input type="number" class="form-control text-center" id="edit_item_0" min="0"></div>
@@ -162,7 +156,6 @@
               <div class="col-4"><label class="form-label small text-muted">บะจ่าง</label><input type="number" class="form-control text-center" id="edit_item_5" min="0"></div>
               <div class="col-12 mt-2"><label class="form-label small text-danger fw-bold">ค่าจัดส่ง / ค่ากล่อง (บาท)</label><input type="number" class="form-control" id="edit_shipping" min="0"></div>
             </div>
-            <div class="text-muted small">* หมายเหตุ: ระบบจะคำนวณยอดเงินรวมใหม่อัตโนมัติเมื่อกดบันทึก</div>
           </form>
         </div>
         <div class="modal-footer bg-light border-0">
@@ -183,7 +176,7 @@
 
     let globalOrders = [];
     let currentProducts = [];
-    let editingOrderIndex = -1; // ตัวแปรเก็บ index ของออเดอร์ที่กำลังแก้ไข
+    let editingOrderIndex = -1;
     
     const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
     const editModal = new bootstrap.Modal(document.getElementById('editModal'));
@@ -209,8 +202,6 @@
         data.forEach((row, index) => {
           let paidIcon = row.isPaid === "TRUE" ? '<i class="fas fa-check-circle text-success"></i>' : '<i class="far fa-circle text-muted"></i>';
           let statusClass = String(row.payment).includes('ยืนยัน') ? 'status-paid' : 'status-wait';
-          
-          // 🟢 เพิ่มปุ่ม "แก้ไข" คู่กับปุ่ม "เปิด" ในตาราง
           html += `<tr>
             <td class="fw-bold text-primary">${row.deliverDate}</td><td class="fw-bold">${row.deliverTime}</td>
             <td>${row.lineId || '-'}</td><td>${row.custName}</td><td>${row.phone}</td>
@@ -229,72 +220,44 @@
       populateSumOrderDates();
     }
 
-    // 🟢 ฟังก์ชันเปิดหน้าต่างแก้ไขข้อมูล
+    // ----- การแก้ไขออเดอร์ -----
     function openEditModal(index) {
       const order = globalOrders[index];
-      editingOrderIndex = index; // จำไว้ว่ากำลังแก้ออเดอร์ไหน
-      
-      // ดึงข้อมูลมาเติมในฟอร์ม
+      editingOrderIndex = index;
       document.getElementById('edit_custName').value = order.custName;
       document.getElementById('edit_phone').value = order.phone;
       document.getElementById('edit_custAdd').value = order.custAdd || '';
-      
       document.getElementById('edit_deliverDate').value = order.deliverDate;
       document.getElementById('edit_deliverTime').value = order.deliverTime;
       document.getElementById('edit_deliverBy').value = order.deliverBy;
       document.getElementById('edit_payment').value = order.payment;
       document.getElementById('edit_note').value = order.note || '';
-      
       for(let i=0; i<6; i++) { document.getElementById(`edit_item_${i}`).value = order.items[i] || 0; }
       document.getElementById('edit_shipping').value = order.shipping || 0;
-
       editModal.show();
     }
 
-    // 🟢 ฟังก์ชันส่งข้อมูลแก้ไขกลับไปที่ Apps Script
     async function saveEditOrder() {
       const order = globalOrders[editingOrderIndex];
       const payload = {
-        action: 'editOrder',
-        rowIndex: order.rowIndex,
-        oldPhone: order.phone, // ส่งเบอร์เก่าไปเผื่อกรณีลูกค้าเปลี่ยนเบอร์ จะได้หาเจอ
-        phone: document.getElementById('edit_phone').value,
-        custName: document.getElementById('edit_custName').value,
-        custAdd: document.getElementById('edit_custAdd').value,
-        deliverDate: document.getElementById('edit_deliverDate').value,
-        deliverTime: document.getElementById('edit_deliverTime').value,
-        deliverBy: document.getElementById('edit_deliverBy').value,
-        payment: document.getElementById('edit_payment').value,
-        shipping: document.getElementById('edit_shipping').value,
-        note: document.getElementById('edit_note').value,
-        items: []
+        action: 'editOrder', rowIndex: order.rowIndex, oldPhone: order.phone,
+        phone: document.getElementById('edit_phone').value, custName: document.getElementById('edit_custName').value,
+        custAdd: document.getElementById('edit_custAdd').value, deliverDate: document.getElementById('edit_deliverDate').value,
+        deliverTime: document.getElementById('edit_deliverTime').value, deliverBy: document.getElementById('edit_deliverBy').value,
+        payment: document.getElementById('edit_payment').value, shipping: document.getElementById('edit_shipping').value,
+        note: document.getElementById('edit_note').value, items: []
       };
-
       for(let i=0; i<6; i++) { payload.items.push(document.getElementById(`edit_item_${i}`).value || 0); }
-
       Swal.fire({ title: 'กำลังอัปเดตข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
       try {
-        const response = await fetch(WEB_APP_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
-        });
+        const response = await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
         const res = await response.json();
-        
-        if(res.status === 'success') {
-          Swal.fire('สำเร็จ!', 'อัปเดตข้อมูลเรียบร้อยแล้ว', 'success');
-          editModal.hide();
-          loadData(); // รีโหลดตารางใหม่
-        } else {
-          Swal.fire('ข้อผิดพลาด', res.message, 'error');
-        }
-      } catch (err) {
-        Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
-      }
+        if(res.status === 'success') { Swal.fire('สำเร็จ!', 'อัปเดตข้อมูลเรียบร้อยแล้ว', 'success'); editModal.hide(); loadData(); } 
+        else Swal.fire('ข้อผิดพลาด', res.message, 'error');
+      } catch (err) { Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error'); }
     }
 
-    // ... (ฟังก์ชันอื่นๆ ทั้งหมด เช่น openDetail, saveNoteOnly, sendReconfirm, printOrder, Sumorder, Settings ยังคงเดิมเหมือนโค้ดก่อนหน้าเป๊ะๆ ครับ ผมใส่รวมให้แล้วด้านบนเพื่อความสมบูรณ์)
+    // ----- การจัดการรายละเอียด / บิล -----
     function openDetail(index) {
       const order = globalOrders[index];
       const products = ['เทียนเค็ม', 'เทียนหวาน', 'เข่งธรรมดา', 'เข่งมะพร้าว', 'ข้าวต้มมัด', 'บะจ่าง'];
@@ -323,8 +286,7 @@
 
     async function saveNoteOnly(rowIndex) {
       const adminNote = document.getElementById('admin_note_input').value;
-      const btn = event.currentTarget;
-      const originalHtml = btn.innerHTML;
+      const btn = event.currentTarget; const originalHtml = btn.innerHTML;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
       try {
         const response = await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'updateNote', rowIndex: rowIndex, adminNote: adminNote }) });
@@ -365,6 +327,7 @@
       } catch (err) { printWin.close(); Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error'); }
     }
 
+    // 🟢 ----- ส่วนของยอดเตรียมสินค้า (แยก 3 หมวดหมู่) ----- 🟢
     function populateSumOrderDates() {
       const dateSelect = document.getElementById('sumorderDateSelect');
       const uniqueDates = [...new Set(globalOrders.map(o => o.deliverDate))];
@@ -378,22 +341,72 @@
     function renderSumOrderTable() {
       const selectedDate = document.getElementById('sumorderDateSelect').value;
       const tbody = document.getElementById('sumorder-body');
-      if (!selectedDate) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">ไม่มีข้อมูลของวันนี้</td></tr>'; return; }
+      if (!selectedDate) { tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">ไม่มีข้อมูลของวันนี้</td></tr>'; return; }
+      
       const ordersOnDate = globalOrders.filter(o => o.deliverDate === selectedDate);
       const summaryByTime = {};
+      
+      // การประมวลผลแยกตาม หมวดหมู่ 3 ประเภท
       ordersOnDate.forEach(o => {
         const time = o.deliverTime || 'ไม่ระบุ';
-        if (!summaryByTime[time]) summaryByTime[time] = [0, 0, 0, 0, 0, 0];
-        for (let i = 0; i < 6; i++) { summaryByTime[time][i] += (parseInt(o.items[i]) || 0); }
+        const rawMethod = String(o.deliverBy || '').toLowerCase();
+        let category = '';
+
+        // แยก 3 กลุ่ม: EMS, Rider, รับหน้าร้าน
+        if (rawMethod.includes('ems') || rawMethod.includes('ไปรษณีย์')) {
+          category = 'EMS';
+        } else if (rawMethod.includes('lineman') || rawMethod.includes('grab') || rawMethod.includes('lalamove') || rawMethod.includes('rider') || rawMethod.includes('raider')) {
+          category = 'Rider';
+        } else {
+          category = 'รับหน้าร้าน'; // ครอบคลุม 'รับหน้าร้าน', 'อื่นๆ'
+        }
+
+        if (!summaryByTime[time]) summaryByTime[time] = {};
+        if (!summaryByTime[time][category]) summaryByTime[time][category] = [0, 0, 0, 0, 0, 0];
+        for (let i = 0; i < 6; i++) { summaryByTime[time][category][i] += (parseInt(o.items[i]) || 0); }
       });
+      
       const sortedTimes = Object.keys(summaryByTime).sort();
-      let html = ''; const dailyTotal = [0, 0, 0, 0, 0, 0];
+      let html = ''; 
+      const dailyTotal = [0, 0, 0, 0, 0, 0];
+      
+      // การตั้งค่า ป้ายสี สำหรับแต่ละหมวดหมู่
+      const catOrder = ['รับหน้าร้าน', 'Rider', 'EMS'];
+      const catBadges = {
+        'รับหน้าร้าน': '<span class="badge bg-success"><i class="fas fa-store"></i> หน้าร้าน</span>',
+        'Rider': '<span class="badge bg-primary"><i class="fas fa-motorcycle"></i> Rider</span>',
+        'EMS': '<span class="badge bg-danger"><i class="fas fa-box"></i> EMS</span>'
+      };
+
       sortedTimes.forEach(time => {
-        const qtys = summaryByTime[time];
-        html += `<tr><td class="fw-bold text-primary">${time}</td><td>${qtys[0] > 0 ? qtys[0] : '-'}</td><td>${qtys[1] > 0 ? qtys[1] : '-'}</td><td>${qtys[2] > 0 ? qtys[2] : '-'}</td><td>${qtys[3] > 0 ? qtys[3] : '-'}</td><td>${qtys[4] > 0 ? qtys[4] : '-'}</td><td>${qtys[5] > 0 ? qtys[5] : '-'}</td></tr>`;
-        for(let k = 0; k < 6; k++) dailyTotal[k] += qtys[k];
+        const catsInTime = Object.keys(summaryByTime[time]).sort((a, b) => catOrder.indexOf(a) - catOrder.indexOf(b));
+        
+        catsInTime.forEach((cat, index) => {
+          const qtys = summaryByTime[time][cat];
+          // สร้างช่อง "เวลา" แบบรวมบรรทัด (Rowspan)
+          const timeRowspan = (index === 0) ? `<td class="fw-bold text-primary align-middle fs-5" rowspan="${catsInTime.length}">${time}</td>` : '';
+          
+          html += `<tr>
+            ${timeRowspan}
+            <td class="fw-bold align-middle">${catBadges[cat]}</td>
+            <td class="align-middle">${qtys[0] > 0 ? qtys[0] : '-'}</td>
+            <td class="align-middle">${qtys[1] > 0 ? qtys[1] : '-'}</td>
+            <td class="align-middle">${qtys[2] > 0 ? qtys[2] : '-'}</td>
+            <td class="align-middle">${qtys[3] > 0 ? qtys[3] : '-'}</td>
+            <td class="align-middle">${qtys[4] > 0 ? qtys[4] : '-'}</td>
+            <td class="align-middle">${qtys[5] > 0 ? qtys[5] : '-'}</td>
+          </tr>`;
+          
+          for(let k = 0; k < 6; k++) dailyTotal[k] += qtys[k];
+        });
       });
-      html += `<tr class="table-warning border-dark fs-5"><td class="text-danger fw-bold">รวมทั้งวัน</td><td class="text-danger fw-bold">${dailyTotal[0]}</td><td class="text-danger fw-bold">${dailyTotal[1]}</td><td class="text-danger fw-bold">${dailyTotal[2]}</td><td class="text-danger fw-bold">${dailyTotal[3]}</td><td class="text-danger fw-bold">${dailyTotal[4]}</td><td class="text-danger fw-bold">${dailyTotal[5]}</td></tr>`;
+      
+      html += `<tr class="table-warning border-dark fs-5">
+        <td colspan="2" class="text-danger fw-bold">รวมทั้งวัน</td>
+        <td class="text-danger fw-bold">${dailyTotal[0]}</td><td class="text-danger fw-bold">${dailyTotal[1]}</td>
+        <td class="text-danger fw-bold">${dailyTotal[2]}</td><td class="text-danger fw-bold">${dailyTotal[3]}</td>
+        <td class="text-danger fw-bold">${dailyTotal[4]}</td><td class="text-danger fw-bold">${dailyTotal[5]}</td>
+      </tr>`;
       tbody.innerHTML = html;
     }
 
@@ -403,10 +416,28 @@
       const printWin = window.open('', '_blank');
       if (!printWin) { Swal.fire('ข้อผิดพลาด', 'เบราว์เซอร์บล็อกหน้าต่าง Pop-up', 'error'); return; }
       const tableHtml = document.getElementById('sumorder-table-container').innerHTML;
-      const finalHtml = `<!DOCTYPE html><html><head><title>ยอดเตรียมสินค้า - ${selectedDate}</title><link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet"><style>body { font-family: 'Sarabun', sans-serif; padding: 20px; } table { width: 100%; border-collapse: collapse; margin-top: 15px; text-align: center; } th, td { border: 1px solid #000; padding: 8px; } th { background-color: #f2f2f2; font-weight: bold; } h2 { text-align: center; } .text-danger { color: #d32f2f; font-weight: bold;} .table-warning { background-color: #fff3cd; }</style></head><body><h2>ใบสรุปยอดเตรียมสินค้า วันที่ ${selectedDate}</h2>${tableHtml}<script>setTimeout(function(){ window.print(); window.close(); }, 500);<\/script></body></html>`;
+      
+      // ใส่ CSS สำหรับเวลาพิมพ์ ให้สีของ Badge ออกมาครบถ้วน
+      const finalHtml = `<!DOCTYPE html><html><head><title>ยอดเตรียมสินค้า - ${selectedDate}</title>
+      <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+      <style>
+        body { font-family: 'Sarabun', sans-serif; padding: 20px; -webkit-print-color-adjust: exact; print-color-adjust: exact; } 
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; text-align: center; } 
+        th, td { border: 1px solid #000; padding: 8px; } 
+        th { background-color: #f2f2f2; font-weight: bold; } 
+        h2 { text-align: center; } 
+        .text-danger { color: #d32f2f; font-weight: bold;} 
+        .table-warning { background-color: #fff3cd !important; }
+        .badge { padding: 5px 10px; border-radius: 5px; font-size: 14px; display: inline-block; }
+        .bg-success { background-color: #198754 !important; color: #fff !important; }
+        .bg-primary { background-color: #0d6efd !important; color: #fff !important; }
+        .bg-danger { background-color: #dc3545 !important; color: #fff !important; }
+      </style></head><body><h2>ใบสรุปยอดเตรียมสินค้า วันที่ ${selectedDate}</h2>${tableHtml}<script>setTimeout(function(){ window.print(); window.close(); }, 800);<\/script></body></html>`;
       printWin.document.open(); printWin.document.write(finalHtml); printWin.document.close();
     }
 
+    // ----- ส่วนของการตั้งค่าสินค้า -----
     async function loadSettings() {
       const tbody = document.getElementById('settings-body');
       tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4"><div class="spinner-border text-primary"></div> กำลังโหลดข้อมูล...</td></tr>';
