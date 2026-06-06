@@ -52,12 +52,13 @@
             <table class="table table-hover table-bordered table-striped align-middle">
               <thead>
                 <tr>
+                  <th>เวลาสั่งซื้อ</th>
                   <th>วันจัดส่ง</th><th>เวลา</th><th>LINE ID</th><th>ชื่อลูกค้า</th><th>เบอร์โทร</th>
                   <th>วิธีรับของ</th><th>สถานะออเดอร์</th><th>ยืนยันรับยอด</th><th>สถานะบิลใหม่</th><th class="text-center">จัดการ</th>
                 </tr>
               </thead>
               <tbody id="table-body">
-                <tr><td colspan="10" class="text-center py-4"><div class="spinner-border text-warning" role="status"></div> กำลังโหลดข้อมูล...</td></tr>
+                <tr><td colspan="11" class="text-center py-4"><div class="spinner-border text-warning" role="status"></div> กำลังโหลดข้อมูล...</td></tr>
               </tbody>
             </table>
           </div>
@@ -146,7 +147,7 @@
               <div class="col-md-4"><label class="form-label small text-muted">สถานะการชำระเงิน</label><input type="text" class="form-control" id="edit_payment"></div>
               <div class="col-md-8"><label class="form-label small text-muted">Note ของร้านค้า</label><input type="text" class="form-control" id="edit_note"></div>
             </div>
-            <h6 class="fw-bold text-info border-bottom pb-2">จำนวนสินค้า (ลูก/คู่)</h6>
+            <h6 class="fw-bold text-info border-bottom pb-2">จำนวนสินค้า (ชิ้น/คู่)</h6>
             <div class="row g-2 mb-3">
               <div class="col-4"><label class="form-label small text-muted">เทียนเค็ม</label><input type="number" class="form-control text-center" id="edit_item_0" min="0"></div>
               <div class="col-4"><label class="form-label small text-muted">เทียนหวาน</label><input type="number" class="form-control text-center" id="edit_item_1" min="0"></div>
@@ -186,23 +187,26 @@
     // ----- ส่วนของรายการสั่งซื้อ -----
     async function loadData() {
       const tbody = document.getElementById('table-body');
-      tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4"><div class="spinner-border text-warning"></div> กำลังโหลดข้อมูล...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="11" class="text-center py-4"><div class="spinner-border text-warning"></div> กำลังโหลดข้อมูล...</td></tr>';
       try {
         const response = await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'getDashboardData' }) });
         const res = await response.json();
         if (res.status === 'success') renderTable(res.data);
-        else tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger py-4 fw-bold">❌ Error: ${res.message}</td></tr>`;
-      } catch (err) { tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger py-4 fw-bold">❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้</td></tr>`; }
+        else tbody.innerHTML = `<tr><td colspan="11" class="text-center text-danger py-4 fw-bold">❌ Error: ${res.message}</td></tr>`;
+      } catch (err) { tbody.innerHTML = `<tr><td colspan="11" class="text-center text-danger py-4 fw-bold">❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้</td></tr>`; }
     }
 
     function renderTable(data) {
       globalOrders = data; let html = '';
-      if(data.length === 0) html = '<tr><td colspan="10" class="text-center text-muted py-4">ไม่มีออเดอร์ค้างส่ง</td></tr>';
+      if(data.length === 0) html = '<tr><td colspan="11" class="text-center text-muted py-4">ไม่มีออเดอร์ค้างส่ง</td></tr>';
       else {
         data.forEach((row, index) => {
           let paidIcon = row.isPaid === "TRUE" ? '<i class="fas fa-check-circle text-success"></i>' : '<i class="far fa-circle text-muted"></i>';
           let statusClass = String(row.payment).includes('ยืนยัน') ? 'status-paid' : 'status-wait';
+          
+          // 🟢 แทรก row.orderTime เป็นคอลัมน์แรกสุด
           html += `<tr>
+            <td class="small text-muted" style="white-space: nowrap;">${row.orderTime}</td>
             <td class="fw-bold text-primary">${row.deliverDate}</td><td class="fw-bold">${row.deliverTime}</td>
             <td>${row.lineId || '-'}</td><td>${row.custName}</td><td>${row.phone}</td>
             <td><span class="badge bg-secondary">${row.deliverBy}</span></td><td class="${statusClass}">${row.payment}</td>
@@ -327,7 +331,7 @@
       } catch (err) { printWin.close(); Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error'); }
     }
 
-    // 🟢 ----- ส่วนของยอดเตรียมสินค้า (แยก 3 หมวดหมู่) ----- 🟢
+    // ----- ส่วนของยอดเตรียมสินค้า -----
     function populateSumOrderDates() {
       const dateSelect = document.getElementById('sumorderDateSelect');
       const uniqueDates = [...new Set(globalOrders.map(o => o.deliverDate))];
@@ -346,19 +350,17 @@
       const ordersOnDate = globalOrders.filter(o => o.deliverDate === selectedDate);
       const summaryByTime = {};
       
-      // การประมวลผลแยกตาม หมวดหมู่ 3 ประเภท
       ordersOnDate.forEach(o => {
         const time = o.deliverTime || 'ไม่ระบุ';
         const rawMethod = String(o.deliverBy || '').toLowerCase();
         let category = '';
 
-        // แยก 3 กลุ่ม: EMS, Rider, รับหน้าร้าน
         if (rawMethod.includes('ems') || rawMethod.includes('ไปรษณีย์')) {
           category = 'EMS';
         } else if (rawMethod.includes('lineman') || rawMethod.includes('grab') || rawMethod.includes('lalamove') || rawMethod.includes('rider') || rawMethod.includes('raider')) {
           category = 'Rider';
         } else {
-          category = 'รับหน้าร้าน'; // ครอบคลุม 'รับหน้าร้าน', 'อื่นๆ'
+          category = 'รับหน้าร้าน'; 
         }
 
         if (!summaryByTime[time]) summaryByTime[time] = {};
@@ -370,7 +372,6 @@
       let html = ''; 
       const dailyTotal = [0, 0, 0, 0, 0, 0];
       
-      // การตั้งค่า ป้ายสี สำหรับแต่ละหมวดหมู่
       const catOrder = ['รับหน้าร้าน', 'Rider', 'EMS'];
       const catBadges = {
         'รับหน้าร้าน': '<span class="badge bg-success"><i class="fas fa-store"></i> หน้าร้าน</span>',
@@ -383,7 +384,6 @@
         
         catsInTime.forEach((cat, index) => {
           const qtys = summaryByTime[time][cat];
-          // สร้างช่อง "เวลา" แบบรวมบรรทัด (Rowspan)
           const timeRowspan = (index === 0) ? `<td class="fw-bold text-primary align-middle fs-5" rowspan="${catsInTime.length}">${time}</td>` : '';
           
           html += `<tr>
@@ -417,7 +417,6 @@
       if (!printWin) { Swal.fire('ข้อผิดพลาด', 'เบราว์เซอร์บล็อกหน้าต่าง Pop-up', 'error'); return; }
       const tableHtml = document.getElementById('sumorder-table-container').innerHTML;
       
-      // ใส่ CSS สำหรับเวลาพิมพ์ ให้สีของ Badge ออกมาครบถ้วน
       const finalHtml = `<!DOCTYPE html><html><head><title>ยอดเตรียมสินค้า - ${selectedDate}</title>
       <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
