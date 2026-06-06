@@ -146,7 +146,7 @@
               <div class="col-md-4"><label class="form-label small text-muted">สถานะการชำระเงิน</label><input type="text" class="form-control" id="edit_payment"></div>
               <div class="col-md-8"><label class="form-label small text-muted">Note ของร้านค้า</label><input type="text" class="form-control" id="edit_note"></div>
             </div>
-            <h6 class="fw-bold text-info border-bottom pb-2">จำนวนสินค้า (ชิ้น/คู่)</h6>
+            <h6 class="fw-bold text-info border-bottom pb-2">จำนวนสินค้า (ลูก/คู่)</h6>
             <div class="row g-2 mb-3">
               <div class="col-4"><label class="form-label small text-muted">เทียนเค็ม</label><input type="number" class="form-control text-center" id="edit_item_0" min="0"></div>
               <div class="col-4"><label class="form-label small text-muted">เทียนหวาน</label><input type="number" class="form-control text-center" id="edit_item_1" min="0"></div>
@@ -261,7 +261,7 @@
     function openDetail(index) {
       const order = globalOrders[index];
       const products = ['เทียนเค็ม', 'เทียนหวาน', 'เข่งธรรมดา', 'เข่งมะพร้าว', 'ข้าวต้มมัด', 'บะจ่าง'];
-      const units = ['ชิ้น', 'ชิ้น', 'คู่', 'คู่', 'ชิ้น', 'ชิ้น'];
+      const units = ['ลูก', 'ลูก', 'คู่', 'คู่', 'คู่', 'ลูก'];
       let itemsHtml = '';
       order.items.forEach((qty, i) => { if(qty > 0) itemsHtml += `<div class="d-flex justify-content-between border-bottom py-1"><span>${products[i]}</span> <strong>${qty} ${units[i]}</strong></div>`; });
 
