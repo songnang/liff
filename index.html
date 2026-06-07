@@ -73,8 +73,8 @@
               <label class="form-label fw-bold text-secondary small">วิธีรับสินค้า <span class="text-danger">*</span></label>
               <select class="form-select fw-bold text-primary" id="deliver_method" name="deliver_method" onchange="updateCart()" required>
                 <option value="รับเองหน้าร้าน">1. รับเอง หน้าร้าน</option>
-                <option value="รับเอง Raider">2. รับเอง Raider</option>
-                <option value="Raider (Lineman/Grab/LalaMove)">3. Raider (Lineman/Grab/LalaMove)</option>
+                <option value="รับเอง Rider">2. รับเอง Rider</option>
+                <option value="Rider (Lineman/Grab/LalaMove)">3. Rider (Lineman/Grab/LalaMove)</option>
                 <option value="EMS">4. EMS</option>
               </select>
             </div>
@@ -256,7 +256,7 @@
 
       const riderBox = document.getElementById('rider_shipping_box');
       
-      // 🟢 2. แสดงช่องเก็บค่าส่ง เฉพาะกรณีให้ร้านเรียก Raider ให้เท่านั้น
+      // 🟢 2. แสดงช่องเก็บค่าส่ง เฉพาะกรณีให้ร้านเรียก Rider ให้เท่านั้น
       if (method === 'EMS') {
         riderBox.style.display = 'none';
         if(totalWeight > 0) {
@@ -275,11 +275,11 @@
           else emsCost = 300;
           shippingCost = boxCost + emsCost;
         }
-      } else if (method === 'Raider (Lineman/Grab/LalaMove)') {
+      } else if (method === 'Rider (Lineman/Grab/LalaMove)') {
         riderBox.style.display = 'block';
         shippingCost = parseInt(document.getElementById('rider_shipping_fee').value) || 0;
       } else {
-        // กรณี "รับเองหน้าร้าน" และ "รับเอง Raider" ร้านไม่ได้เป็นคนจ่ายค่ารถ จึงไม่ต้องระบุค่าส่ง
+        // กรณี "รับเองหน้าร้าน" และ "รับเอง Rider" ร้านไม่ได้เป็นคนจ่ายค่ารถ จึงไม่ต้องระบุค่าส่ง
         riderBox.style.display = 'none';
         shippingCost = 0;
       }
@@ -295,7 +295,7 @@
       } else if (totalKheng > 0 && totalKheng < 30) {
         btn.disabled = true;
         if(totalKheng > 0) Swal.fire({ icon: 'warning', title: 'สั่งขั้นต่ำไม่ถึงเกณฑ์', text: 'ขนมเข่งต้องสั่งรวมกันขั้นต่ำ 30 คู่ขึ้นไปครับ', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
-      } else if (method === 'Raider (Lineman/Grab/LalaMove)' && document.getElementById('rider_shipping_fee').value === "") {
+      } else if (method === 'Rider (Lineman/Grab/LalaMove)' && document.getElementById('rider_shipping_fee').value === "") {
         btn.disabled = true;
       } else {
         btn.disabled = false;
