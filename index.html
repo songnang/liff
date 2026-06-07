@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ร้านขนมเทียนสองนาง 1.08</title>
+  <title>ร้านขนมเทียนสองนาง 1.01</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   
@@ -20,14 +20,15 @@
     .card { border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; overflow: hidden; }
     .card-header { background-color: #d35400; color: white; font-weight: bold; border-bottom: none; }
     .btn-qty { width: 35px; height: 35px; padding: 0; border-radius: 50%; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
+    
+    /* 🟢 ปรับขอบช่องกรอกตัวเลขให้ดูสวยงามขึ้นเมื่อพิมพ์เอง */
     .form-control, .form-select { border-radius: 10px; border: 1px solid #ffcc80; }
     .form-control:focus, .form-select:focus { border-color: #d35400; box-shadow: 0 0 0 0.2rem rgba(211, 84, 0, 0.25); }
+    .qty-input { border: 1px solid #ddd !important; border-radius: 5px !important; margin: 0 5px; }
+
     .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 20px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); z-index: 1000; border-radius: 20px 20px 0 0; }
-    
-    /* 🟢 หน้าจอ Loading */
     #loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fcf3eb; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
     #main-app { display: none; }
-    
     .spinner-orange { width: 3rem; height: 3rem; color: #d35400; }
   </style>
 </head>
@@ -67,31 +68,45 @@
         <div class="card">
           <div class="card-header"><i class="fas fa-truck"></i> ข้อมูลการจัดส่ง</div>
           <div class="card-body">
+            
             <div class="mb-3">
-              <label class="form-label fw-bold text-secondary small">วิธีรับสินค้า</label>
-              <select class="form-select" id="deliver_method" name="deliver_method" onchange="updateCart()" required>
-                <option value="รับหน้าร้าน">รับหน้าร้าน (ตลาดพระราม 5)</option>
-                <option value="EMS">จัดส่งไปรษณีย์ (EMS)</option>
-                <option value="Lineman">Lineman</option>
-                <option value="Grab">Grab</option>
-                <option value="LalaMove">LalaMove</option>
+              <label class="form-label fw-bold text-secondary small">วิธีรับสินค้า <span class="text-danger">*</span></label>
+              <select class="form-select fw-bold text-primary" id="deliver_method" name="deliver_method" onchange="updateCart()" required>
+                <option value="รับเองหน้าร้าน">1. รับเอง หน้าร้าน</option>
+                <option value="รับเอง Raider">2. รับเอง Raider</option>
+                <option value="Raider (Lineman/Grab/LalaMove)">3. Raider (Lineman/Grab/LalaMove)</option>
+                <option value="EMS">4. EMS</option>
               </select>
             </div>
             
             <div class="row g-2 mb-3">
               <div class="col-6">
                 <label class="form-label fw-bold text-secondary small">วันที่รับของ</label>
-                <input type="date" class="form-control" name="deliver_date" required>
+                <input type="date" class="form-control" id="deliver_date" name="deliver_date" required>
               </div>
               <div class="col-6">
                 <label class="form-label fw-bold text-secondary small">เวลาที่รับของ</label>
-                <input type="time" class="form-control" name="deliver_time" required>
+                <select class="form-select" name="deliver_time" required>
+                  <option value="06:00">06:00 น.</option>
+                  <option value="07:00">07:00 น.</option>
+                  <option value="08:00">08:00 น.</option>
+                  <option value="09:00">09:00 น.</option>
+                  <option value="10:00">10:00 น.</option>
+                  <option value="11:00">11:00 น.</option>
+                  <option value="12:00">12:00 น.</option>
+                  <option value="13:00">13:00 น.</option>
+                  <option value="14:00">14:00 น.</option>
+                  <option value="15:00">15:00 น.</option>
+                  <option value="16:00">16:00 น.</option>
+                  <option value="17:00">17:00 น.</option>
+                  <option value="18:00">18:00 น.</option>
+                </select>
               </div>
             </div>
             
             <div class="mb-3" id="rider_shipping_box" style="display:none;">
               <label class="form-label fw-bold text-primary small">ระบุค่าจัดส่งตามแอป (บาท) <span class="text-danger">*</span></label>
-              <input type="number" class="form-control border-primary" id="rider_shipping_fee" placeholder="ตัวอย่าง: 65 (เก็บปลายทางใส่ 0)" oninput="updateCart()">
+              <input type="number" inputmode="numeric" class="form-control border-primary" id="rider_shipping_fee" placeholder="ตัวอย่าง: 65 (เก็บปลายทางใส่ 0)" oninput="updateCart()">
             </div>
           </div>
         </div>
@@ -101,7 +116,7 @@
           <div class="card-body">
             <div class="mb-3">
               <label class="form-label fw-bold text-secondary small">เบอร์โทรศัพท์ <span class="text-danger">*</span></label>
-              <input type="tel" class="form-control" id="cust_phone" name="cust_phone" placeholder="08X-XXX-XXXX" required>
+              <input type="tel" inputmode="numeric" pattern="[0-9\-]*" class="form-control" id="cust_phone" name="cust_phone" placeholder="08X-XXX-XXXX" required>
             </div>
             <div class="mb-2">
               <label class="form-label fw-bold text-secondary small">ที่อยู่จัดส่ง / หมายเหตุถึงร้าน</label>
@@ -125,7 +140,7 @@
 
   <script>
     // ========================================================
-    // ⚠️ 1. ใส่ลิงก์ Web App และ LIFF ID ของคุณที่นี่
+    // ⚠️ ใส่ลิงก์ Web App และ LIFF ID ของคุณที่นี่
     // ========================================================
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyQ7Q4WA4eWfFVnMLX8w4W5lzGKnroi8DyJ5QRhBVzQsv5qmMyvV2M8POlDQZEKEv1d/exec"; 
     const LIFF_ID = "2009156099-XkhIO3sS"; 
@@ -133,36 +148,30 @@
     let products = [];
     let isDataLoaded = false;
 
-    // 🟢 ระบบจับเวลา: ถ้า 12 วินาทีแล้วโหลดยังไม่เสร็จ ให้แจ้งเตือน
     const timeoutTimer = setTimeout(() => {
       if (!isDataLoaded) {
         Swal.fire({
-          icon: 'warning',
-          title: 'การเชื่อมต่อล่าช้า',
+          icon: 'warning', title: 'การเชื่อมต่อล่าช้า',
           text: 'เซิร์ฟเวอร์อาจทำงานหนัก หรืออินเทอร์เน็ตไม่เสถียร กรุณากดปุ่มด้านล่างเพื่อโหลดหน้าเว็บใหม่อีกครั้งครับ',
-          confirmButtonText: '<i class="fas fa-sync-alt"></i> โหลดหน้าเว็บใหม่',
-          confirmButtonColor: '#d35400',
-          allowOutsideClick: false,
-          allowEscapeKey: false
-        }).then((result) => {
-          if (result.isConfirmed) {
-            window.location.reload();
-          }
-        });
+          confirmButtonText: '<i class="fas fa-sync-alt"></i> โหลดหน้าเว็บใหม่', confirmButtonColor: '#d35400',
+          allowOutsideClick: false, allowEscapeKey: false
+        }).then((result) => { if (result.isConfirmed) window.location.reload(); });
       }
     }, 12000);
 
-    // 🟢 เริ่มต้นการทำงานเมื่อเปิดหน้าเว็บ
     window.onload = async function() {
-      try {
-        // 1. ตรวจสอบการล็อกอินผ่าน LIFF
-        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
-        if (!liff.isLoggedIn()) {
-          liff.login();
-          return;
-        }
+      // 🟢 3. ตั้งค่า Default ช่องวันที่ให้เป็น "วันพรุ่งนี้" ทันทีที่เปิดเว็บ
+      const tmr = new Date();
+      tmr.setDate(tmr.getDate() + 1); // บวกไป 1 วัน
+      const yyyy = tmr.getFullYear();
+      const mm = String(tmr.getMonth() + 1).padStart(2, '0');
+      const dd = String(tmr.getDate()).padStart(2, '0');
+      document.getElementById('deliver_date').value = `${yyyy}-${mm}-${dd}`;
 
-        // 2. ดึงข้อมูลโปรไฟล์ลูกค้า
+      try {
+        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
+        if (!liff.isLoggedIn()) { liff.login(); return; }
+
         const profile = await liff.getProfile();
         document.getElementById('cust_name').value = profile.displayName;
         document.getElementById('cust_lineid').value = profile.displayName; 
@@ -170,22 +179,16 @@
 
         document.getElementById('loading-text').innerText = "กำลังดึงรายการสินค้า...";
 
-        // 3. ยิงไปขอรายการสินค้าจาก Google Apps Script (แบบไม่ต้องใช้ PIN)
         const res = await fetch(WEB_APP_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: 'getProducts' })
         });
         
         const data = await res.json();
         if (data.status === 'success') {
-          products = data.data;
-          renderProducts(); // วาดเมนูสินค้า
-        } else {
-          throw new Error("ไม่สามารถโหลดสินค้าได้");
-        }
+          products = data.data; renderProducts();
+        } else throw new Error("ไม่สามารถโหลดสินค้าได้");
 
-        // 🟢 สำเร็จ! หยุดนาฬิกาและแสดงหน้าจอแอป
         isDataLoaded = true;
         clearTimeout(timeoutTimer);
         document.getElementById('loading-screen').style.display = 'none';
@@ -196,17 +199,17 @@
       }
     };
 
-    // 🟢 ฟังก์ชันวาดรายการสินค้าลงบนหน้าเว็บ
     function renderProducts() {
       let html = '';
       products.forEach(p => {
-        if(p.isHidden) return; // ถ้าตั้งซ่อนเมนูไว้ ให้ข้ามไปเลย
+        if(p.isHidden) return; 
         
+        // 🟢 1. ขยายช่องให้กว้างขึ้น, เรียก Number Keypad, และอนุญาตให้พิมพ์ตัวเลขเองได้ (oninput)
         let stockHtml = p.isOutOfStock 
           ? `<div class="bg-danger text-white text-center py-1 small fw-bold rounded mt-2">สินค้าหมดชั่วคราว</div>` 
-          : `<div class="input-group input-group-sm mt-2" style="width: 110px;">
+          : `<div class="input-group input-group-sm mt-2" style="width: 140px;">
                <button class="btn btn-outline-danger btn-qty" type="button" onclick="adjustQty('${p.id}', -1)">-</button>
-               <input type="number" class="form-control text-center fw-bold border-0 bg-transparent px-0" id="${p.id}" name="${p.id}" value="0" readonly>
+               <input type="number" inputmode="numeric" pattern="[0-9]*" class="form-control text-center fw-bold qty-input" id="${p.id}" name="${p.id}" value="0" min="0" oninput="updateCart()">
                <button class="btn btn-outline-success btn-qty" type="button" onclick="adjustQty('${p.id}', 1)">+</button>
              </div>`;
              
@@ -225,26 +228,25 @@
       document.getElementById('product-list').innerHTML = html;
     }
 
-    // 🟢 ฟังก์ชันเพิ่ม-ลดจำนวนสินค้า
     function adjustQty(id, change) {
       const input = document.getElementById(id);
-      let newQty = parseInt(input.value) + change;
+      let newQty = (parseInt(input.value) || 0) + change;
       if(newQty < 0) newQty = 0;
       input.value = newQty;
       updateCart();
     }
 
-    // 🟢 ฟังก์ชันคำนวณราคาสินค้าทั้งหมด และค่าส่ง
     function updateCart() {
-      let itemTotal = 0;
-      let totalWeight = 0;
-      let totalKheng = 0;
-      let shippingCost = 0;
+      let itemTotal = 0; let totalWeight = 0; let totalKheng = 0; let shippingCost = 0;
       let method = document.getElementById('deliver_method').value;
 
       products.forEach(p => {
         if(p.isHidden || p.isOutOfStock) return;
-        const qty = parseInt(document.getElementById(p.id).value) || 0;
+        
+        const input = document.getElementById(p.id);
+        // ป้องกันลูกค้าพิมพ์ตัวอักษรแปลกๆ หากพิมพ์แปลกๆ ให้ค่าเป็น 0
+        const qty = parseInt(input.value) || 0; 
+        
         itemTotal += qty * p.price;
         if(p.isEms) totalWeight += qty * p.weight;
         if(p.id === 'qty_plain' || p.id === 'qty_coco') totalKheng += qty;
@@ -252,8 +254,9 @@
 
       document.getElementById('slip_weight').innerText = (totalWeight / 1000).toFixed(2);
 
-      // จัดการค่าจัดส่ง
       const riderBox = document.getElementById('rider_shipping_box');
+      
+      // 🟢 2. แสดงช่องเก็บค่าส่ง เฉพาะกรณีให้ร้านเรียก Raider ให้เท่านั้น
       if (method === 'EMS') {
         riderBox.style.display = 'none';
         if(totalWeight > 0) {
@@ -272,10 +275,11 @@
           else emsCost = 300;
           shippingCost = boxCost + emsCost;
         }
-      } else if (method === 'Lineman' || method === 'Grab' || method === 'LalaMove') {
+      } else if (method === 'Raider (Lineman/Grab/LalaMove)') {
         riderBox.style.display = 'block';
         shippingCost = parseInt(document.getElementById('rider_shipping_fee').value) || 0;
       } else {
+        // กรณี "รับเองหน้าร้าน" และ "รับเอง Raider" ร้านไม่ได้เป็นคนจ่ายค่ารถ จึงไม่ต้องระบุค่าส่ง
         riderBox.style.display = 'none';
         shippingCost = 0;
       }
@@ -285,68 +289,45 @@
       document.getElementById('total_price_hidden').value = grandTotal;
       document.getElementById('shipping_hidden').value = shippingCost;
 
-      // ระบบล็อคปุ่มยืนยัน
       const btn = document.getElementById('btn-submit');
       if (itemTotal === 0) {
         btn.disabled = true;
       } else if (totalKheng > 0 && totalKheng < 30) {
-        // หากสั่งขนมเข่ง ต้องสั่งรวมกันขั้นต่ำ 30 คู่
         btn.disabled = true;
         if(totalKheng > 0) Swal.fire({ icon: 'warning', title: 'สั่งขั้นต่ำไม่ถึงเกณฑ์', text: 'ขนมเข่งต้องสั่งรวมกันขั้นต่ำ 30 คู่ขึ้นไปครับ', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
-      } else if ((method === 'Lineman' || method === 'Grab' || method === 'LalaMove') && document.getElementById('rider_shipping_fee').value === "") {
+      } else if (method === 'Raider (Lineman/Grab/LalaMove)' && document.getElementById('rider_shipping_fee').value === "") {
         btn.disabled = true;
       } else {
         btn.disabled = false;
       }
     }
 
-    // 🟢 ฟังก์ชันส่งข้อมูลเมื่อลูกค้ากดปุ่ม "ยืนยันสั่งซื้อ"
     async function submitForm(e) {
       e.preventDefault();
-      
       const formElement = document.getElementById('orderForm');
       const formData = new FormData(formElement);
       const formObj = Object.fromEntries(formData.entries());
 
-      // ตรวจสอบขั้นสุดท้าย
       if (parseInt(formObj.total_price_hidden) === 0) return;
 
-      Swal.fire({
-        title: 'กำลังส่งออเดอร์...',
-        text: 'กรุณารอสักครู่ ระบบกำลังบันทึกข้อมูลครับ',
-        allowOutsideClick: false,
-        didOpen: () => { Swal.showLoading(); }
-      });
+      Swal.fire({ title: 'กำลังส่งออเดอร์...', text: 'กรุณารอสักครู่ ระบบกำลังบันทึกข้อมูลครับ', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
       try {
         const res = await fetch(WEB_APP_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          // ส่ง action 'submitOrder' ไปให้ Code.gs จัดการต่อ
+          method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: 'submitOrder', form: formObj }) 
         });
-        
         const result = await res.json();
         
         if (result.status === 'success') {
           Swal.fire({
-            icon: 'success',
-            title: 'ส่งออเดอร์เรียบร้อย!',
-            text: 'ใบเสร็จและรายละเอียดโอนเงินได้ถูกส่งไปที่แชท LINE ของคุณแล้วครับ',
-            confirmButtonText: 'ปิดหน้าต่าง',
-            confirmButtonColor: '#28a745'
-          }).then(() => {
-            liff.closeWindow(); // ปิดหน้าจอทิ้งเลย
-          });
-        } else {
-          Swal.fire('ข้อผิดพลาด', result.message, 'error');
-        }
-      } catch (err) {
-        Swal.fire('ข้อผิดพลาด', 'เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ', 'error');
-      }
+            icon: 'success', title: 'ส่งออเดอร์เรียบร้อย!', text: 'ใบเสร็จและรายละเอียดโอนเงินได้ถูกส่งไปที่แชท LINE ของคุณแล้วครับ',
+            confirmButtonText: 'ปิดหน้าต่าง', confirmButtonColor: '#28a745'
+          }).then(() => { liff.closeWindow(); });
+        } else Swal.fire('ข้อผิดพลาด', result.message, 'error');
+      } catch (err) { Swal.fire('ข้อผิดพลาด', 'เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ', 'error'); }
     }
 
-    // ระบบจัดฟอร์แมตเบอร์โทรอัตโนมัติ
     document.getElementById('cust_phone').addEventListener('input', function (e) {
       let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
       e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
