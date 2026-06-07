@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📦 ร้านขนมเทียนสองนาง 1.07</title>
+  <title>📦 ร้านขนมเทียนสองนาง 1.08</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
@@ -23,91 +23,73 @@
 </head>
 <body>
 
-  <nav class="navbar navbar-expand-lg navbar-dark p-3">
-    <div class="container-fluid">
-      <a class="navbar-brand fw-bold" href="#"><i class="fas fa-store"></i> ร้านขนมเทียนสองนาง V 1.07</a>
-      <div class="d-flex align-items-center">
-        <a href="manual.html" target="_blank" class="btn btn-light btn-sm fw-bold text-danger shadow-sm rounded-pill px-3">
-          <i class="fas fa-book"></i> คู่มือการใช้งาน
-        </a>
-      </div>
-    </div>
-  </nav>
-
-  <div class="container-fluid p-4">
-    <ul class="nav nav-pills mb-4 bg-white p-2 rounded shadow-sm d-inline-flex" id="pills-tab" role="tablist">
-      <li class="nav-item" role="presentation"><button class="nav-link active rounded-pill px-4" id="pills-orders-tab" data-bs-toggle="pill" data-bs-target="#pills-orders" type="button" role="tab"><i class="fas fa-clipboard-list"></i> รายการสั่งซื้อ</button></li>
-      <li class="nav-item" role="presentation"><button class="nav-link rounded-pill px-4" id="pills-summary-tab" data-bs-toggle="pill" data-bs-target="#pills-summary" type="button" role="tab" onclick="renderSumOrderTable()"><i class="fas fa-boxes"></i> ยอดเตรียมสินค้า</button></li>
-      <li class="nav-item" role="presentation"><button class="nav-link rounded-pill px-4" id="pills-products-tab" data-bs-toggle="pill" data-bs-target="#pills-products" type="button" role="tab" onclick="loadSettings()"><i class="fas fa-cogs"></i> ตั้งค่าสินค้า</button></li>
-    </ul>
-
-    <div class="tab-content" id="pills-tabContent">
-      <div class="tab-pane fade show active" id="pills-orders" role="tabpanel">
-        <div class="card card-dashboard p-3">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold text-dark m-0"><i class="fas fa-list text-warning"></i> ออเดอร์ที่ต้องจัดส่ง (ตั้งแต่วันนี้)</h5>
-            <button class="btn btn-outline-secondary btn-sm" onclick="loadData()"><i class="fas fa-sync-alt"></i> รีเฟรช</button>
-          </div>
-          <div class="table-responsive">
-            <table class="table table-hover table-bordered table-striped align-middle">
-              <thead>
-                <tr>
-                  <th>เวลาสั่งซื้อ</th>
-                  <th>วันจัดส่ง</th><th>เวลา</th><th>LINE ID</th><th>ชื่อลูกค้า</th><th>เบอร์โทร</th>
-                  <th>วิธีรับของ</th><th>สถานะออเดอร์</th><th>ยืนยันรับยอด</th><th>สถานะบิลใหม่</th><th class="text-center">จัดการ</th>
-                </tr>
-              </thead>
-              <tbody id="table-body">
-                <tr><td colspan="11" class="text-center py-4"><div class="spinner-border text-warning" role="status"></div> กำลังโหลดข้อมูล...</td></tr>
-              </tbody>
-            </table>
-          </div>
+  <div id="main-ui" style="display: none;">
+    <nav class="navbar navbar-expand-lg navbar-dark p-3">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="#"><i class="fas fa-store"></i> ร้านขนมเทียนสองนาง V 1.08</a>
+        <div class="d-flex align-items-center">
+          <a href="manual.html" target="_blank" class="btn btn-light btn-sm fw-bold text-danger shadow-sm rounded-pill px-3"><i class="fas fa-book"></i> คู่มือการใช้งาน</a>
         </div>
       </div>
+    </nav>
 
-      <div class="tab-pane fade" id="pills-summary" role="tabpanel">
-        <div class="card card-dashboard p-4">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <h5 class="fw-bold text-dark m-0"><i class="fas fa-box-open text-success"></i> สรุปจำนวนสินค้าที่ต้องเตรียม</h5>
-            <div class="d-flex align-items-center bg-light p-2 rounded border">
-              <label for="sumorderDateSelect" class="form-label me-2 mb-0 fw-bold text-primary">เลือกวันที่:</label>
-              <select id="sumorderDateSelect" class="form-select form-select-sm w-auto border-primary text-primary fw-bold" onchange="renderSumOrderTable()"><option value="">ไม่มีข้อมูล</option></select>
+    <div class="container-fluid p-4">
+      <ul class="nav nav-pills mb-4 bg-white p-2 rounded shadow-sm d-inline-flex" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation"><button class="nav-link active rounded-pill px-4" id="pills-orders-tab" data-bs-toggle="pill" data-bs-target="#pills-orders" type="button" role="tab"><i class="fas fa-clipboard-list"></i> รายการสั่งซื้อ</button></li>
+        <li class="nav-item" role="presentation"><button class="nav-link rounded-pill px-4" id="pills-summary-tab" data-bs-toggle="pill" data-bs-target="#pills-summary" type="button" role="tab" onclick="renderSumOrderTable()"><i class="fas fa-boxes"></i> ยอดเตรียมสินค้า</button></li>
+        <li class="nav-item" role="presentation"><button class="nav-link rounded-pill px-4" id="pills-products-tab" data-bs-toggle="pill" data-bs-target="#pills-products" type="button" role="tab" onclick="loadSettings()"><i class="fas fa-cogs"></i> ตั้งค่าสินค้า</button></li>
+      </ul>
+
+      <div class="tab-content" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="pills-orders" role="tabpanel">
+          <div class="card card-dashboard p-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold text-dark m-0"><i class="fas fa-list text-warning"></i> ออเดอร์ที่ต้องจัดส่ง (ตั้งแต่วันนี้)</h5>
+              <button class="btn btn-outline-secondary btn-sm" onclick="loadData()"><i class="fas fa-sync-alt"></i> รีเฟรช</button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover table-bordered table-striped align-middle">
+                <thead><tr><th>เวลาสั่งซื้อ</th><th>วันจัดส่ง</th><th>เวลา</th><th>LINE ID</th><th>ชื่อลูกค้า</th><th>เบอร์โทร</th><th>วิธีรับของ</th><th>สถานะออเดอร์</th><th>ยืนยันรับยอด</th><th>สถานะบิลใหม่</th><th class="text-center">จัดการ</th></tr></thead>
+                <tbody id="table-body"><tr><td colspan="11" class="text-center py-4"><div class="spinner-border text-warning" role="status"></div> กำลังโหลดข้อมูล...</td></tr></tbody>
+              </table>
             </div>
           </div>
-          <div class="table-responsive" id="sumorder-table-container">
-            <table class="table table-bordered align-middle text-center table-striped">
-              <thead class="table-warning border-dark">
-                <tr>
-                  <th width="12%">เวลาจัดส่ง</th>
-                  <th width="15%">ช่องทางรับ</th>
-                  <th>เทียนเค็ม</th><th>เทียนหวาน</th><th>เข่งธรรมดา</th><th>เข่งมะพร้าว</th><th>ข้าวต้มมัด</th><th>บะจ่าง</th>
-                </tr>
-              </thead>
-              <tbody id="sumorder-body"><tr><td colspan="8" class="text-center py-4 text-muted">กรุณารอโหลดข้อมูล...</td></tr></tbody>
-            </table>
-          </div>
-          <div class="text-end mt-2"><button class="btn btn-outline-success btn-sm rounded-pill shadow-sm" onclick="printSumOrder()"><i class="fas fa-print"></i> พิมพ์ยอดเตรียมสินค้า</button></div>
         </div>
-      </div>
 
-      <div class="tab-pane fade" id="pills-products" role="tabpanel">
-        <div class="card card-dashboard p-4">
-          <h5 class="fw-bold text-dark mb-4"><i class="fas fa-sliders-h text-primary"></i> ปรับแต่งราคาสินค้าและสถานะ</h5>
-          <div class="table-responsive">
-            <table class="table table-bordered align-middle">
-              <thead class="table-light text-center">
-                <tr><th class="text-start">สินค้า</th><th width="20%">ราคา (บาท)</th><th width="20%">สถานะหมด (ปิดรับ)</th><th width="20%">ซ่อนเมนู</th></tr>
-              </thead>
-              <tbody id="settings-body"><tr><td colspan="4" class="text-center py-4"><div class="spinner-border text-primary"></div> กำลังโหลดข้อมูล...</td></tr></tbody>
-            </table>
+        <div class="tab-pane fade" id="pills-summary" role="tabpanel">
+          <div class="card card-dashboard p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="fw-bold text-dark m-0"><i class="fas fa-box-open text-success"></i> สรุปจำนวนสินค้าที่ต้องเตรียม</h5>
+              <div class="d-flex align-items-center bg-light p-2 rounded border">
+                <label for="sumorderDateSelect" class="form-label me-2 mb-0 fw-bold text-primary">เลือกวันที่:</label>
+                <select id="sumorderDateSelect" class="form-select form-select-sm w-auto border-primary text-primary fw-bold" onchange="renderSumOrderTable()"><option value="">ไม่มีข้อมูล</option></select>
+              </div>
+            </div>
+            <div class="table-responsive" id="sumorder-table-container">
+              <table class="table table-bordered align-middle text-center table-striped">
+                <thead class="table-warning border-dark"><tr><th width="12%">เวลาจัดส่ง</th><th width="15%">ช่องทางรับ</th><th>เทียนเค็ม</th><th>เทียนหวาน</th><th>เข่งธรรมดา</th><th>เข่งมะพร้าว</th><th>ข้าวต้มมัด</th><th>บะจ่าง</th></tr></thead>
+                <tbody id="sumorder-body"><tr><td colspan="8" class="text-center py-4 text-muted">กรุณารอโหลดข้อมูล...</td></tr></tbody>
+              </table>
+            </div>
+            <div class="text-end mt-2"><button class="btn btn-outline-success btn-sm rounded-pill shadow-sm" onclick="printSumOrder()"><i class="fas fa-print"></i> พิมพ์ยอดเตรียมสินค้า</button></div>
           </div>
-          <div class="text-end mt-3"><button class="btn btn-success fw-bold px-4 rounded-pill shadow-sm" onclick="saveSettings()"><i class="fas fa-save"></i> บันทึกการตั้งค่า</button></div>
+        </div>
+
+        <div class="tab-pane fade" id="pills-products" role="tabpanel">
+          <div class="card card-dashboard p-4">
+            <h5 class="fw-bold text-dark mb-4"><i class="fas fa-sliders-h text-primary"></i> ปรับแต่งราคาสินค้าและสถานะ</h5>
+            <div class="table-responsive">
+              <table class="table table-bordered align-middle">
+                <thead class="table-light text-center"><tr><th class="text-start">สินค้า</th><th width="20%">ราคา (บาท)</th><th width="20%">สถานะหมด (ปิดรับ)</th><th width="20%">ซ่อนเมนู</th></tr></thead>
+                <tbody id="settings-body"><tr><td colspan="4" class="text-center py-4"><div class="spinner-border text-primary"></div> กำลังโหลดข้อมูล...</td></tr></tbody>
+              </table>
+            </div>
+            <div class="text-end mt-3"><button class="btn btn-success fw-bold px-4 rounded-pill shadow-sm" onclick="saveSettings()"><i class="fas fa-save"></i> บันทึกการตั้งค่า</button></div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="modal fade" id="detailModal" tabindex="-1">
+  </div> <div class="modal fade" id="detailModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow">
         <div class="modal-header bg-warning text-dark border-0">
@@ -178,18 +160,60 @@
     let globalOrders = [];
     let currentProducts = [];
     let editingOrderIndex = -1;
+    let API_PIN = ""; // 🔒 ตัวแปรเก็บรหัสผ่านเป็น Secret Key
     
     const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
     const editModal = new bootstrap.Modal(document.getElementById('editModal'));
 
-    window.onload = loadData;
+    // 🔒 เมื่อเปิดเว็บ ให้ถามรหัสผ่านก่อนเลย
+    window.onload = requireLogin;
+
+    function requireLogin() {
+      Swal.fire({
+        title: '🔒 เข้าสู่ระบบผู้ดูแลร้าน',
+        input: 'password',
+        inputPlaceholder: 'ใส่ PIN เพื่อเข้าสู่ระบบ...',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        confirmButtonText: 'เข้าสู่ระบบ <i class="fas fa-sign-in-alt"></i>',
+        confirmButtonColor: '#d35400'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          verifyPin(result.value);
+        }
+      });
+    }
+
+    async function verifyPin(pin) {
+      Swal.fire({ title: 'กำลังตรวจสอบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      try {
+        const response = await fetch(WEB_APP_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'verifyPin', pin: pin }) // 🔒 ส่งไปตรวจ
+        });
+        const res = await response.json();
+        
+        if (res.status === 'success') {
+          API_PIN = pin; // เซฟ PIN ไว้ส่งไปกับทุกคำสั่งหลังจากนี้
+          document.getElementById('main-ui').style.display = 'block'; // แสดงหน้าเว็บ
+          Swal.close();
+          loadData(); // เริ่มดึงข้อมูลได้เลย
+        } else {
+          Swal.fire({ icon: 'error', title: 'รหัสผิด!', text: res.message }).then(() => requireLogin());
+        }
+      } catch (err) {
+        Swal.fire('ข้อผิดพลาด', 'เชื่อมต่อไม่ได้', 'error').then(() => requireLogin());
+      }
+    }
 
     // ----- ส่วนของรายการสั่งซื้อ -----
     async function loadData() {
       const tbody = document.getElementById('table-body');
       tbody.innerHTML = '<tr><td colspan="11" class="text-center py-4"><div class="spinner-border text-warning"></div> กำลังโหลดข้อมูล...</td></tr>';
       try {
-        const response = await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'getDashboardData' }) });
+        // 🔒 แนบ pin: API_PIN ไปด้วยทุกครั้ง
+        const response = await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'getDashboardData', pin: API_PIN }) });
         const res = await response.json();
         if (res.status === 'success') renderTable(res.data);
         else tbody.innerHTML = `<tr><td colspan="11" class="text-center text-danger py-4 fw-bold">❌ Error: ${res.message}</td></tr>`;
@@ -203,21 +227,7 @@
         data.forEach((row, index) => {
           let paidIcon = row.isPaid === "TRUE" ? '<i class="fas fa-check-circle text-success"></i>' : '<i class="far fa-circle text-muted"></i>';
           let statusClass = String(row.payment).includes('ยืนยัน') ? 'status-paid' : 'status-wait';
-          
-          // 🟢 แทรก row.orderTime เป็นคอลัมน์แรกสุด
-          html += `<tr>
-            <td class="small text-muted" style="white-space: nowrap;">${row.orderTime}</td>
-            <td class="fw-bold text-primary">${row.deliverDate}</td><td class="fw-bold">${row.deliverTime}</td>
-            <td>${row.lineId || '-'}</td><td>${row.custName}</td><td>${row.phone}</td>
-            <td><span class="badge bg-secondary">${row.deliverBy}</span></td><td class="${statusClass}">${row.payment}</td>
-            <td class="text-center fs-5">${paidIcon}</td><td class="small text-danger">${row.reconfirmStatus}</td>
-            <td class="text-center">
-              <div class="btn-group">
-                <button class="btn btn-outline-primary btn-sm shadow-sm" onclick="openDetail(${index})" title="ดูรายละเอียด"><i class="fas fa-search"></i></button>
-                <button class="btn btn-outline-info btn-sm shadow-sm" onclick="openEditModal(${index})" title="แก้ไขข้อมูล"><i class="fas fa-edit"></i></button>
-              </div>
-            </td>
-          </tr>`;
+          html += `<tr><td class="small text-muted" style="white-space: nowrap;">${row.orderTime}</td><td class="fw-bold text-primary">${row.deliverDate}</td><td class="fw-bold">${row.deliverTime}</td><td>${row.lineId || '-'}</td><td>${row.custName}</td><td>${row.phone}</td><td><span class="badge bg-secondary">${row.deliverBy}</span></td><td class="${statusClass}">${row.payment}</td><td class="text-center fs-5">${paidIcon}</td><td class="small text-danger">${row.reconfirmStatus}</td><td class="text-center"><div class="btn-group"><button class="btn btn-outline-primary btn-sm shadow-sm" onclick="openDetail(${index})" title="ดูรายละเอียด"><i class="fas fa-search"></i></button><button class="btn btn-outline-info btn-sm shadow-sm" onclick="openEditModal(${index})" title="แก้ไขข้อมูล"><i class="fas fa-edit"></i></button></div></td></tr>`;
         });
       }
       document.getElementById('table-body').innerHTML = html;
@@ -228,23 +238,14 @@
     function openEditModal(index) {
       const order = globalOrders[index];
       editingOrderIndex = index;
-      document.getElementById('edit_custName').value = order.custName;
-      document.getElementById('edit_phone').value = order.phone;
-      document.getElementById('edit_custAdd').value = order.custAdd || '';
-      document.getElementById('edit_deliverDate').value = order.deliverDate;
-      document.getElementById('edit_deliverTime').value = order.deliverTime;
-      document.getElementById('edit_deliverBy').value = order.deliverBy;
-      document.getElementById('edit_payment').value = order.payment;
-      document.getElementById('edit_note').value = order.note || '';
-      for(let i=0; i<6; i++) { document.getElementById(`edit_item_${i}`).value = order.items[i] || 0; }
-      document.getElementById('edit_shipping').value = order.shipping || 0;
+      document.getElementById('edit_custName').value = order.custName; document.getElementById('edit_phone').value = order.phone; document.getElementById('edit_custAdd').value = order.custAdd || ''; document.getElementById('edit_deliverDate').value = order.deliverDate; document.getElementById('edit_deliverTime').value = order.deliverTime; document.getElementById('edit_deliverBy').value = order.deliverBy; document.getElementById('edit_payment').value = order.payment; document.getElementById('edit_note').value = order.note || ''; for(let i=0; i<6; i++) { document.getElementById(`edit_item_${i}`).value = order.items[i] || 0; } document.getElementById('edit_shipping').value = order.shipping || 0;
       editModal.show();
     }
 
     async function saveEditOrder() {
       const order = globalOrders[editingOrderIndex];
       const payload = {
-        action: 'editOrder', rowIndex: order.rowIndex, oldPhone: order.phone,
+        action: 'editOrder', pin: API_PIN, rowIndex: order.rowIndex, oldPhone: order.phone,
         phone: document.getElementById('edit_phone').value, custName: document.getElementById('edit_custName').value,
         custAdd: document.getElementById('edit_custAdd').value, deliverDate: document.getElementById('edit_deliverDate').value,
         deliverTime: document.getElementById('edit_deliverTime').value, deliverBy: document.getElementById('edit_deliverBy').value,
@@ -293,7 +294,7 @@
       const btn = event.currentTarget; const originalHtml = btn.innerHTML;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
       try {
-        const response = await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'updateNote', rowIndex: rowIndex, adminNote: adminNote }) });
+        const response = await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'updateNote', pin: API_PIN, rowIndex: rowIndex, adminNote: adminNote }) });
         const res = await response.json();
         if(res.status === 'success') {
           const orderIndex = globalOrders.findIndex(o => o.rowIndex === rowIndex);
@@ -306,11 +307,11 @@
 
     async function sendReconfirm(rowIndex) {
       const adminNote = document.getElementById('admin_note_input').value; 
-      const confirmResult = await Swal.fire({ title: 'ยืนยันการส่งบิลใหม่?', text: "ระบบจะใช้ยอด, ราคา และ Note ล่าสุด ไปสร้างบิลส่งเข้า LINE ลูกค้าอีกครั้ง", icon: 'warning', showCancelButton: true, confirmButtonColor: '#0288d1', confirmButtonText: 'ใช่, ส่งเลย!' });
+      const confirmResult = await Swal.fire({ title: 'ยืนยันการส่งบิลใหม่?', text: "ระบบจะส่งใบเสร็จเข้า LINE ลูกค้าอีกครั้ง", icon: 'warning', showCancelButton: true, confirmButtonColor: '#0288d1', confirmButtonText: 'ใช่, ส่งเลย!' });
       if (confirmResult.isConfirmed) {
         Swal.fire({ title: 'กำลังส่ง...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
         try {
-          const response = await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'reconfirmOrder', rowIndex: rowIndex, adminNote: adminNote }) });
+          const response = await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'reconfirmOrder', pin: API_PIN, rowIndex: rowIndex, adminNote: adminNote }) });
           const res = await response.json();
           if(res.status === 'success') { Swal.fire('สำเร็จ!', 'ส่งใบเสร็จเรียบร้อยแล้ว', 'success'); detailModal.hide(); loadData(); } 
           else Swal.fire('ข้อผิดพลาด', res.message, 'error');
@@ -324,7 +325,7 @@
       if (!printWin) { Swal.fire('ข้อผิดพลาด', 'เบราว์เซอร์บล็อกหน้าต่าง Pop-up', 'error'); return; }
       printWin.document.write('<h3 style="font-family:sans-serif; text-align:center; padding-top:50px; color:#555;">🖨️ กำลังสร้างใบเตรียมสินค้า...</h3>');
       try {
-        const response = await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'getPrintHtml', rowIndex: orderData.rowIndex }) });
+        const response = await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'getPrintHtml', pin: API_PIN, rowIndex: orderData.rowIndex }) });
         const res = await response.json();
         if (res.status === 'success') { printWin.document.open(); printWin.document.write(res.html); printWin.document.write('<script>setTimeout(function(){ window.print(); }, 800);<\\/script>'.replace('\\/', '/')); printWin.document.close(); } 
         else { printWin.close(); Swal.fire('ข้อผิดพลาด', res.message, 'error'); }
@@ -346,93 +347,41 @@
       const selectedDate = document.getElementById('sumorderDateSelect').value;
       const tbody = document.getElementById('sumorder-body');
       if (!selectedDate) { tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">ไม่มีข้อมูลของวันนี้</td></tr>'; return; }
-      
       const ordersOnDate = globalOrders.filter(o => o.deliverDate === selectedDate);
       const summaryByTime = {};
-      
       ordersOnDate.forEach(o => {
-        const time = o.deliverTime || 'ไม่ระบุ';
-        const rawMethod = String(o.deliverBy || '').toLowerCase();
-        let category = '';
-
-        if (rawMethod.includes('ems') || rawMethod.includes('ไปรษณีย์')) {
-          category = 'EMS';
-        } else if (rawMethod.includes('lineman') || rawMethod.includes('grab') || rawMethod.includes('lalamove') || rawMethod.includes('rider') || rawMethod.includes('raider')) {
-          category = 'Rider';
-        } else {
-          category = 'รับหน้าร้าน'; 
-        }
-
+        const time = o.deliverTime || 'ไม่ระบุ'; const rawMethod = String(o.deliverBy || '').toLowerCase(); let category = '';
+        if (rawMethod.includes('ems') || rawMethod.includes('ไปรษณีย์')) { category = 'EMS'; } 
+        else if (rawMethod.includes('lineman') || rawMethod.includes('grab') || rawMethod.includes('lalamove') || rawMethod.includes('rider') || rawMethod.includes('raider')) { category = 'Rider'; } 
+        else { category = 'รับหน้าร้าน'; }
         if (!summaryByTime[time]) summaryByTime[time] = {};
         if (!summaryByTime[time][category]) summaryByTime[time][category] = [0, 0, 0, 0, 0, 0];
         for (let i = 0; i < 6; i++) { summaryByTime[time][category][i] += (parseInt(o.items[i]) || 0); }
       });
       
       const sortedTimes = Object.keys(summaryByTime).sort();
-      let html = ''; 
-      const dailyTotal = [0, 0, 0, 0, 0, 0];
-      
+      let html = ''; const dailyTotal = [0, 0, 0, 0, 0, 0];
       const catOrder = ['รับหน้าร้าน', 'Rider', 'EMS'];
-      const catBadges = {
-        'รับหน้าร้าน': '<span class="badge bg-success"><i class="fas fa-store"></i> หน้าร้าน</span>',
-        'Rider': '<span class="badge bg-primary"><i class="fas fa-motorcycle"></i> Rider</span>',
-        'EMS': '<span class="badge bg-danger"><i class="fas fa-box"></i> EMS</span>'
-      };
+      const catBadges = { 'รับหน้าร้าน': '<span class="badge bg-success"><i class="fas fa-store"></i> หน้าร้าน</span>', 'Rider': '<span class="badge bg-primary"><i class="fas fa-motorcycle"></i> Rider</span>', 'EMS': '<span class="badge bg-danger"><i class="fas fa-box"></i> EMS</span>' };
 
       sortedTimes.forEach(time => {
         const catsInTime = Object.keys(summaryByTime[time]).sort((a, b) => catOrder.indexOf(a) - catOrder.indexOf(b));
-        
         catsInTime.forEach((cat, index) => {
           const qtys = summaryByTime[time][cat];
           const timeRowspan = (index === 0) ? `<td class="fw-bold text-primary align-middle fs-5" rowspan="${catsInTime.length}">${time}</td>` : '';
-          
-          html += `<tr>
-            ${timeRowspan}
-            <td class="fw-bold align-middle">${catBadges[cat]}</td>
-            <td class="align-middle">${qtys[0] > 0 ? qtys[0] : '-'}</td>
-            <td class="align-middle">${qtys[1] > 0 ? qtys[1] : '-'}</td>
-            <td class="align-middle">${qtys[2] > 0 ? qtys[2] : '-'}</td>
-            <td class="align-middle">${qtys[3] > 0 ? qtys[3] : '-'}</td>
-            <td class="align-middle">${qtys[4] > 0 ? qtys[4] : '-'}</td>
-            <td class="align-middle">${qtys[5] > 0 ? qtys[5] : '-'}</td>
-          </tr>`;
-          
+          html += `<tr>${timeRowspan}<td class="fw-bold align-middle">${catBadges[cat]}</td><td class="align-middle">${qtys[0] > 0 ? qtys[0] : '-'}</td><td class="align-middle">${qtys[1] > 0 ? qtys[1] : '-'}</td><td class="align-middle">${qtys[2] > 0 ? qtys[2] : '-'}</td><td class="align-middle">${qtys[3] > 0 ? qtys[3] : '-'}</td><td class="align-middle">${qtys[4] > 0 ? qtys[4] : '-'}</td><td class="align-middle">${qtys[5] > 0 ? qtys[5] : '-'}</td></tr>`;
           for(let k = 0; k < 6; k++) dailyTotal[k] += qtys[k];
         });
       });
-      
-      html += `<tr class="table-warning border-dark fs-5">
-        <td colspan="2" class="text-danger fw-bold">รวมทั้งวัน</td>
-        <td class="text-danger fw-bold">${dailyTotal[0]}</td><td class="text-danger fw-bold">${dailyTotal[1]}</td>
-        <td class="text-danger fw-bold">${dailyTotal[2]}</td><td class="text-danger fw-bold">${dailyTotal[3]}</td>
-        <td class="text-danger fw-bold">${dailyTotal[4]}</td><td class="text-danger fw-bold">${dailyTotal[5]}</td>
-      </tr>`;
+      html += `<tr class="table-warning border-dark fs-5"><td colspan="2" class="text-danger fw-bold">รวมทั้งวัน</td><td class="text-danger fw-bold">${dailyTotal[0]}</td><td class="text-danger fw-bold">${dailyTotal[1]}</td><td class="text-danger fw-bold">${dailyTotal[2]}</td><td class="text-danger fw-bold">${dailyTotal[3]}</td><td class="text-danger fw-bold">${dailyTotal[4]}</td><td class="text-danger fw-bold">${dailyTotal[5]}</td></tr>`;
       tbody.innerHTML = html;
     }
 
     function printSumOrder() {
-      const selectedDate = document.getElementById('sumorderDateSelect').value;
-      if (!selectedDate) return;
-      const printWin = window.open('', '_blank');
-      if (!printWin) { Swal.fire('ข้อผิดพลาด', 'เบราว์เซอร์บล็อกหน้าต่าง Pop-up', 'error'); return; }
+      const selectedDate = document.getElementById('sumorderDateSelect').value; if (!selectedDate) return;
+      const printWin = window.open('', '_blank'); if (!printWin) { Swal.fire('ข้อผิดพลาด', 'เบราว์เซอร์บล็อกหน้าต่าง Pop-up', 'error'); return; }
       const tableHtml = document.getElementById('sumorder-table-container').innerHTML;
-      
-      const finalHtml = `<!DOCTYPE html><html><head><title>ยอดเตรียมสินค้า - ${selectedDate}</title>
-      <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-      <style>
-        body { font-family: 'Sarabun', sans-serif; padding: 20px; -webkit-print-color-adjust: exact; print-color-adjust: exact; } 
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; text-align: center; } 
-        th, td { border: 1px solid #000; padding: 8px; } 
-        th { background-color: #f2f2f2; font-weight: bold; } 
-        h2 { text-align: center; } 
-        .text-danger { color: #d32f2f; font-weight: bold;} 
-        .table-warning { background-color: #fff3cd !important; }
-        .badge { padding: 5px 10px; border-radius: 5px; font-size: 14px; display: inline-block; }
-        .bg-success { background-color: #198754 !important; color: #fff !important; }
-        .bg-primary { background-color: #0d6efd !important; color: #fff !important; }
-        .bg-danger { background-color: #dc3545 !important; color: #fff !important; }
-      </style></head><body><h2>ใบสรุปยอดเตรียมสินค้า วันที่ ${selectedDate}</h2>${tableHtml}<script>setTimeout(function(){ window.print(); window.close(); }, 800);<\/script></body></html>`;
+      const finalHtml = `<!DOCTYPE html><html><head><title>ยอดเตรียมสินค้า - ${selectedDate}</title><link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"><style>body { font-family: 'Sarabun', sans-serif; padding: 20px; -webkit-print-color-adjust: exact; print-color-adjust: exact; } table { width: 100%; border-collapse: collapse; margin-top: 15px; text-align: center; } th, td { border: 1px solid #000; padding: 8px; } th { background-color: #f2f2f2; font-weight: bold; } h2 { text-align: center; } .text-danger { color: #d32f2f; font-weight: bold;} .table-warning { background-color: #fff3cd !important; } .badge { padding: 5px 10px; border-radius: 5px; font-size: 14px; display: inline-block; } .bg-success { background-color: #198754 !important; color: #fff !important; } .bg-primary { background-color: #0d6efd !important; color: #fff !important; } .bg-danger { background-color: #dc3545 !important; color: #fff !important; }</style></head><body><h2>ใบสรุปยอดเตรียมสินค้า วันที่ ${selectedDate}</h2>${tableHtml}<script>setTimeout(function(){ window.print(); window.close(); }, 800);<\/script></body></html>`;
       printWin.document.open(); printWin.document.write(finalHtml); printWin.document.close();
     }
 
@@ -441,7 +390,7 @@
       const tbody = document.getElementById('settings-body');
       tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4"><div class="spinner-border text-primary"></div> กำลังโหลดข้อมูล...</td></tr>';
       try {
-        const response = await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'getProducts' }) });
+        const response = await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'getProducts', pin: API_PIN }) });
         const res = await response.json();
         if (res.status === 'success') { currentProducts = res.data; renderSettingsTable(); }
         else tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4 fw-bold">❌ Error: ${res.message}</td></tr>`;
@@ -464,7 +413,7 @@
         p.isOutOfStock = document.getElementById(`stock_${index}`).checked; p.isHidden = document.getElementById(`hidden_${index}`).checked;
       });
       try {
-        const response = await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'saveProducts', products: currentProducts }) });
+        const response = await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'saveProducts', pin: API_PIN, products: currentProducts }) });
         const res = await response.json();
         if (res.status === 'success') Swal.fire('สำเร็จ!', 'บันทึกการตั้งค่าสินค้าเรียบร้อยแล้ว<br><small>ลูกค้าที่เปิดเว็บใหม่จะเห็นราคานี้ทันที</small>', 'success');
         else Swal.fire('ข้อผิดพลาด', res.message, 'error');
