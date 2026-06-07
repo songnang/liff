@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ร้านขนมเทียนสองนาง 1.02</title>
+  <title>ร้านขนมเทียนสองนาง 1.03</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -121,7 +121,7 @@
             <h3 class="text-danger fw-bold mb-0" style="line-height: 1;"><span id="display_total">0</span> <small class="fs-6">฿</small></h3>
           </div>
           <button type="submit" id="btn-submit" class="btn btn-success fw-bold px-4 rounded-pill shadow-sm" disabled>
-            ยืนยันสั่งซื้อ <i class="fas fa-check-circle"></i>
+            สั่งซื้อ <i class="fas fa-chevron-right"></i>
           </button>
         </div>
       </form>
@@ -139,7 +139,6 @@
     let isDataLoaded = false;
     let lineProfile = null;
 
-    // 🟢 ระบบจับเวลา: ถ้า 12 วินาทีแล้วโหลดไม่เสร็จ ให้เด้งเตือน
     const timeoutTimer = setTimeout(() => {
       if (!isDataLoaded) {
         Swal.fire({
@@ -152,12 +151,10 @@
     }, 12000);
 
     window.onload = async function() {
-      // เซ็ตวันที่ล่วงหน้า 1 วัน
       const tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
       document.getElementById('deliver_date').value = tmr.toISOString().split('T')[0];
 
       try {
-        // 1. ตรวจสอบการล็อกอิน
         await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
         if (!liff.isLoggedIn()) { liff.login(); return; }
 
@@ -165,11 +162,9 @@
         document.getElementById('cust_lineid').value = lineProfile.displayName; 
         document.getElementById('line_uid').value = lineProfile.userId;
         
-        // โชว์ข้อความต้อนรับ
         document.getElementById('greeting-name').innerHTML = `สวัสดีคุณ <span class="text-danger">${lineProfile.displayName}</span> 💖`;
         document.getElementById('loading-text').innerText = "กำลังดึงข้อมูลร้านค้า...";
 
-        // 2. ดึงข้อมูลสินค้า + ประวัติลูกค้า (ส่ง UID ไปเช็คด้วย) แบบครั้งเดียวจบ!
         const res = await fetch(WEB_APP_URL, {
           method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: 'getInitData', uid: lineProfile.userId })
@@ -180,19 +175,15 @@
           products = data.products; 
           renderProducts();
 
-          // 3. ตรวจสอบสถานะลูกค้าเก่า
           if(data.user && data.user.found) {
-            // ลูกค้าเก่า: เติม เบอร์, ชื่อ, ที่อยู่
             document.getElementById('cust_phone').value = data.user.phone;
             document.getElementById('cust_name').value = data.user.name;
             document.getElementById('cust_add').value = data.user.address;
           } else {
-            // ลูกค้าใหม่: เติมแค่ชื่อไลน์
             document.getElementById('cust_name').value = lineProfile.displayName;
           }
         }
 
-        // 🟢 สมบูรณ์: หยุดเวลา เปิดหน้าเว็บ
         isDataLoaded = true;
         clearTimeout(timeoutTimer);
         document.getElementById('loading-screen').style.display = 'none';
@@ -203,14 +194,12 @@
       }
     };
 
-    // 🟢 ระบบดักจับการพิมพ์เบอร์โทร (เพื่อดึงประวัติลูกค้าเก่า กรณีแอดมินหรือไรเดอร์พิมพ์แทน)
     let phoneTimeout = null;
     function handlePhoneInput(e) {
       let val = e.target.value.replace(/\D/g, '');
       let formatted = !val[3] ? val : val.slice(0,3) + '-' + val.slice(3,6) + (val[6] ? '-' + val.slice(6,10) : '');
       e.target.value = formatted;
 
-      // ถ้าพิมพ์ครบ 10 ตัว ให้หน่วงเวลา 0.5 วิ แล้วค้นหา
       if (val.length >= 10) {
         clearTimeout(phoneTimeout);
         phoneTimeout = setTimeout(() => { checkOldCustomerByPhone(val); }, 500);
@@ -298,10 +287,27 @@
       else { btn.disabled = false; }
     }
 
+    // 🟢 2. เพิ่ม Popup ให้กดยืนยันอีกครั้ง ป้องกันการเผลอกด
     async function submitForm(e) {
       e.preventDefault();
       const formObj = Object.fromEntries(new FormData(document.getElementById('orderForm')).entries());
       if (parseInt(formObj.total_price_hidden) === 0) return;
+
+      const confirmResult = await Swal.fire({
+        title: 'ยืนยันคำสั่งซื้อ?',
+        html: `ยอดชำระสุทธิของคุณคือ <b class="text-danger fs-4">${Number(formObj.total_price_hidden).toLocaleString()} บาท</b><br><span style="font-size:0.9em; color:#666;">(ตรวจสอบรายการให้ถูกต้องก่อนกดยืนยัน)</span>`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#dc3545',
+        confirmButtonText: '<i class="fas fa-check-circle"></i> ยืนยันสั่งซื้อ',
+        cancelButtonText: 'ยกเลิก'
+      });
+
+      // ถ้ายกเลิก หรือ ปิด Popup ให้หยุดการทำงาน
+      if (!confirmResult.isConfirmed) {
+        return; 
+      }
 
       Swal.fire({ title: 'กำลังส่งออเดอร์...', text: 'กรุณารอสักครู่ ระบบกำลังบันทึกข้อมูลครับ', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
