@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📦 ร้านขนมเทียนสองนาง 1.08</title>
+  <title>📦 ร้านขนมเทียนสองนาง 1.09</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
@@ -220,14 +220,31 @@
       } catch (err) { tbody.innerHTML = `<tr><td colspan="11" class="text-center text-danger py-4 fw-bold">❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้</td></tr>`; }
     }
 
-    function renderTable(data) {
+function renderTable(data) {
       globalOrders = data; let html = '';
       if(data.length === 0) html = '<tr><td colspan="11" class="text-center text-muted py-4">ไม่มีออเดอร์ค้างส่ง</td></tr>';
       else {
         data.forEach((row, index) => {
-          let paidIcon = row.isPaid === "TRUE" ? '<i class="fas fa-check-circle text-success"></i>' : '<i class="far fa-circle text-muted"></i>';
+          // 🟢 เปลี่ยนจากไอคอน เป็นปุ่มกดยืนยันรับยอด
+          let paidIcon = row.isPaid === "TRUE" 
+            ? '<i class="fas fa-check-circle text-success fs-4"></i>' 
+            : `<button class="btn btn-success btn-sm rounded-pill fw-bold shadow-sm px-3" onclick="confirmPayment(${index})"><i class="fas fa-check"></i> ยืนยัน</button>`;
+            
           let statusClass = String(row.payment).includes('ยืนยัน') ? 'status-paid' : 'status-wait';
-          html += `<tr><td class="small text-muted" style="white-space: nowrap;">${row.orderTime}</td><td class="fw-bold text-primary">${row.deliverDate}</td><td class="fw-bold">${row.deliverTime}</td><td>${row.lineId || '-'}</td><td>${row.custName}</td><td>${row.phone}</td><td><span class="badge bg-secondary">${row.deliverBy}</span></td><td class="${statusClass}">${row.payment}</td><td class="text-center fs-5">${paidIcon}</td><td class="small text-danger">${row.reconfirmStatus}</td><td class="text-center"><div class="btn-group"><button class="btn btn-outline-primary btn-sm shadow-sm" onclick="openDetail(${index})" title="ดูรายละเอียด"><i class="fas fa-search"></i></button><button class="btn btn-outline-info btn-sm shadow-sm" onclick="openEditModal(${index})" title="แก้ไขข้อมูล"><i class="fas fa-edit"></i></button></div></td></tr>`;
+          
+          html += `<tr>
+            <td class="small text-muted" style="white-space: nowrap;">${row.orderTime}</td>
+            <td class="fw-bold text-primary">${row.deliverDate}</td><td class="fw-bold">${row.deliverTime}</td>
+            <td>${row.lineId || '-'}</td><td>${row.custName}</td><td>${row.phone}</td>
+            <td><span class="badge bg-secondary">${row.deliverBy}</span></td><td class="${statusClass}">${row.payment}</td>
+            <td class="text-center">${paidIcon}</td><td class="small text-danger">${row.reconfirmStatus}</td>
+            <td class="text-center">
+              <div class="btn-group">
+                <button class="btn btn-outline-primary btn-sm shadow-sm" onclick="openDetail(${index})" title="ดูรายละเอียด"><i class="fas fa-search"></i></button>
+                <button class="btn btn-outline-info btn-sm shadow-sm" onclick="openEditModal(${index})" title="แก้ไขข้อมูล"><i class="fas fa-edit"></i></button>
+              </div>
+            </td>
+          </tr>`;
         });
       }
       document.getElementById('table-body').innerHTML = html;
@@ -419,6 +436,43 @@
         else Swal.fire('ข้อผิดพลาด', res.message, 'error');
       } catch (err) { Swal.fire('ข้อผิดพลาด', 'ไม่สามารถบันทึกได้ กรุณาลองใหม่', 'error'); }
     }
+
+    // 🟢 ฟังก์ชันส่งคำสั่งยืนยันรับยอด ไปที่ Google Sheet
+    async function confirmPayment(index) {
+      const order = globalOrders[index];
+      const confirmResult = await Swal.fire({
+        title: 'ยืนยันรับยอดเงิน?',
+        html: `ต้องการยืนยันรับยอด <b>${Number(order.total).toLocaleString()} บาท</b><br>จากคุณ ${order.custName} ใช่หรือไม่?<br><small class="text-danger mt-2">(ระบบจะอัปเดตตาราง และส่ง LINE แจ้งลูกค้าทันที)</small>`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '<i class="fas fa-check-circle"></i> ยืนยันรับยอดเลย',
+        cancelButtonText: 'ยกเลิก'
+      });
+
+      if (confirmResult.isConfirmed) {
+        Swal.fire({ title: 'กำลังอัปเดตข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        try {
+          const response = await fetch(WEB_APP_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'confirmPayment', pin: API_PIN, rowIndex: order.rowIndex })
+          });
+          const res = await response.json();
+          
+          if (res.status === 'success') {
+            Swal.fire({ icon: 'success', title: 'สำเร็จ!', text: 'ยืนยันรับยอดและแจ้งลูกค้าเรียบร้อยแล้ว', timer: 2000, showConfirmButton: false });
+            loadData(); // ดึงข้อมูลใหม่เพื่อรีเฟรชตาราง
+          } else {
+            Swal.fire('ข้อผิดพลาด', res.message, 'error');
+          }
+        } catch (err) {
+          Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+        }
+      }
+    }
+    
   </script>
 </body>
 </html>
