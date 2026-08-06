@@ -139,6 +139,7 @@
     let products = [];
     let isDataLoaded = false;
     let lineProfile = null;
+    let minKhengRequired = 30; // 🟢 ตัวแปรเก็บจำนวนขั้นต่ำ (ค่า Default)
 
     const timeoutTimer = setTimeout(() => {
       if (!isDataLoaded) {
@@ -174,6 +175,7 @@
         const data = await res.json();
         if (data.status === 'success') {
           products = data.products; 
+          minKhengRequired = parseInt(data.minKheng) || 0; // 🟢 อัปเดตค่าจาก Google Sheet
           renderProducts();
 
           if(data.user && data.user.found) {
@@ -310,10 +312,25 @@ function updateCart() {
       document.getElementById('shipping_hidden').value = shippingCost;
 
       const btn = document.getElementById('btn-submit');
-      if (itemTotal === 0) { btn.disabled = true; } 
-      else if (totalKheng > 0 && totalKheng < 30) { btn.disabled = true; if(totalKheng > 0) Swal.fire({ icon: 'warning', title: 'สั่งขั้นต่ำไม่ถึงเกณฑ์', text: 'ขนมเข่งต้องสั่งรวมกันขั้นต่ำ 30 คู่ขึ้นไปครับ', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 }); } 
-      else if (method === 'Raider (Lineman/Grab/LalaMove)' && document.getElementById('rider_shipping_fee').value === "") { btn.disabled = true; } 
-      else { btn.disabled = false; }
+      if (itemTotal === 0) { 
+        btn.disabled = true; 
+      } 
+      // 🟢 เช็คว่าถ้ามีการตั้งค่าขั้นต่ำ (>0) และลูกค้าสั่งขนมเข่งมาไม่ถึงเกณฑ์ ถึงจะบล็อกปุ่ม
+      else if (minKhengRequired > 0 && totalKheng > 0 && totalKheng < minKhengRequired) { 
+        btn.disabled = true; 
+        Swal.fire({ 
+          icon: 'warning', 
+          title: 'สั่งขั้นต่ำไม่ถึงเกณฑ์', 
+          text: `ขนมเข่งต้องสั่งรวมกันขั้นต่ำ ${minKhengRequired} คู่ขึ้นไปครับ`, 
+          toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 
+        }); 
+      } 
+      else if (method === 'Raider (Lineman/Grab/LalaMove)' && document.getElementById('rider_shipping_fee').value === "") { 
+        btn.disabled = true; 
+      } 
+      else { 
+        btn.disabled = false; 
+      }
     }
     
     // 🟢 2. เพิ่ม Popup ให้กดยืนยันอีกครั้ง ป้องกันการเผลอกด
