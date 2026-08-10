@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📦 ร้านขนมเทียนสองนาง 1.09</title>
+  <title>📦 ร้านขนมเทียนสองนาง 1.10</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
@@ -151,9 +151,12 @@
             </div>
           </form>
         </div>
-        <div class="modal-footer bg-light border-0">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-          <button type="button" class="btn btn-info text-white fw-bold" onclick="saveEditOrder()"><i class="fas fa-save"></i> บันทึกการแก้ไข</button>
+          <div class="modal-footer bg-light border-0 d-flex justify-content-between">
+          <button type="button" class="btn btn-danger" onclick="deleteOrder()"><i class="fas fa-trash"></i> ลบออเดอร์</button>
+          <div>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+            <button type="button" class="btn btn-info text-white fw-bold" onclick="saveEditOrder()"><i class="fas fa-save"></i> บันทึกการแก้ไข</button>
+          </div>
         </div>
       </div>
     </div>
@@ -289,6 +292,43 @@ function renderTable(data) {
       } catch (err) { Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error'); }
     }
 
+    async function deleteOrder() {
+      const order = globalOrders[editingOrderIndex];
+      
+      const confirmResult = await Swal.fire({
+        title: 'ยืนยันการลบออเดอร์?',
+        html: `คุณกำลังจะลบออเดอร์ของ <b>คุณ ${order.custName}</b><br><small class="text-danger">⚠️ เมื่อลบแล้วจะไม่สามารถกู้คืนข้อมูลได้!</small>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '<i class="fas fa-trash"></i> ใช่, ลบทิ้งเลย',
+        cancelButtonText: 'ยกเลิก'
+      });
+
+      if (confirmResult.isConfirmed) {
+        Swal.fire({ title: 'กำลังลบข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        try {
+          const response = await fetch(WEB_APP_URL, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+            body: JSON.stringify({ action: 'deleteOrder', pin: API_PIN, rowIndex: order.rowIndex }) 
+          });
+          const res = await response.json();
+          
+          if(res.status === 'success') { 
+            Swal.fire({ icon: 'success', title: 'ลบสำเร็จ!', text: 'ออเดอร์ถูกลบออกจากระบบแล้ว', timer: 1500, showConfirmButton: false });
+            editModal.hide(); 
+            loadData(); // ดึงข้อมูลใหม่เพื่อรีเฟรชตาราง
+          } else {
+            Swal.fire('ข้อผิดพลาด', res.message, 'error');
+          }
+        } catch (err) { 
+          Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error'); 
+        }
+      }
+    }
+    
     // ----- การจัดการรายละเอียด / บิล -----
     function openDetail(index) {
       const order = globalOrders[index];
@@ -493,7 +533,7 @@ async function loadSettings() {
         }
       }
     }
-    
+   
   </script>
 </body>
 </html>
