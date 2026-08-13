@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📦 ร้านขนมเทียนสองนาง 1.10</title>
+  <title>📦 ร้านขนมเทียนสองนาง 1.11</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
@@ -26,7 +26,7 @@
   <div id="main-ui" style="display: none;">
     <nav class="navbar navbar-expand-lg navbar-dark p-3">
       <div class="container-fluid">
-        <a class="navbar-brand fw-bold" href="#"><i class="fas fa-store"></i> ร้านขนมเทียนสองนาง V 1.10</a>
+        <a class="navbar-brand fw-bold" href="#"><i class="fas fa-store"></i> ร้านขนมเทียนสองนาง V 1.11</a>
         <div class="d-flex align-items-center">
           <a href="manual.html" target="_blank" class="btn btn-light btn-sm fw-bold text-danger shadow-sm rounded-pill px-3"><i class="fas fa-book"></i> คู่มือการใช้งาน</a>
         </div>
@@ -37,6 +37,8 @@
       <ul class="nav nav-pills mb-4 bg-white p-2 rounded shadow-sm d-inline-flex" id="pills-tab" role="tablist">
         <li class="nav-item" role="presentation"><button class="nav-link active rounded-pill px-4" id="pills-orders-tab" data-bs-toggle="pill" data-bs-target="#pills-orders" type="button" role="tab"><i class="fas fa-clipboard-list"></i> รายการสั่งซื้อ</button></li>
         <li class="nav-item" role="presentation"><button class="nav-link rounded-pill px-4" id="pills-summary-tab" data-bs-toggle="pill" data-bs-target="#pills-summary" type="button" role="tab" onclick="renderSumOrderTable()"><i class="fas fa-boxes"></i> ยอดเตรียมสินค้า</button></li>
+        <!-- 🟢 แท็บใหม่: สรุปยอดขาย -->
+        <li class="nav-item" role="presentation"><button class="nav-link rounded-pill px-4" id="pills-monthly-tab" data-bs-toggle="pill" data-bs-target="#pills-monthly" type="button" role="tab" onclick="loadMonthlySummary()"><i class="fas fa-chart-line"></i> สรุปยอดขาย</button></li>
         <li class="nav-item" role="presentation"><button class="nav-link rounded-pill px-4" id="pills-products-tab" data-bs-toggle="pill" data-bs-target="#pills-products" type="button" role="tab" onclick="loadSettings()"><i class="fas fa-cogs"></i> ตั้งค่าสินค้า</button></li>
       </ul>
 
@@ -75,6 +77,33 @@
           </div>
         </div>
 
+        <!-- 🟢 หน้า: สรุปยอดขายประจำเดือน -->
+        <div class="tab-pane fade" id="pills-monthly" role="tabpanel">
+          <div class="card card-dashboard p-4">
+            <h5 class="fw-bold text-dark mb-4"><i class="fas fa-chart-bar text-success"></i> สรุปยอดขายประจำเดือน <span class="text-muted fs-6">(เฉพาะออเดอร์ที่ยืนยันรับยอดแล้ว)</span></h5>
+            <div class="table-responsive">
+              <table class="table table-bordered align-middle text-center table-striped">
+                <thead class="table-dark">
+                  <tr>
+                    <th>เดือน/ปี</th>
+                    <th>จำนวนออเดอร์</th>
+                    <th>ยอดขายรวม (บาท)</th>
+                    <th>เทียนเค็ม</th>
+                    <th>เทียนหวาน</th>
+                    <th>เข่งธรรมดา</th>
+                    <th>เข่งมะพร้าว</th>
+                    <th>ข้าวต้มมัด</th>
+                    <th>บะจ่าง</th>
+                  </tr>
+                </thead>
+                <tbody id="monthly-summary-body">
+                  <tr><td colspan="9" class="text-center py-4"><div class="spinner-border text-primary"></div> กำลังโหลดข้อมูล...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
         <div class="tab-pane fade" id="pills-products" role="tabpanel">
           <div class="card card-dashboard p-4">
             <h5 class="fw-bold text-dark mb-4"><i class="fas fa-sliders-h text-primary"></i> ปรับแต่งราคาสินค้าและสถานะ</h5>
@@ -533,7 +562,63 @@ async function loadSettings() {
         }
       }
     }
-   
+
+  // ==========================================
+    // 🟢 ระบบสรุปยอดขายประจำเดือน
+    // ==========================================
+    async function loadMonthlySummary() {
+      const tbody = document.getElementById('monthly-summary-body');
+      tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4"><div class="spinner-border text-primary"></div> กำลังดึงข้อมูลยอดขาย...</td></tr>';
+      try {
+        const response = await fetch(WEB_APP_URL, { 
+          method: 'POST', 
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+          body: JSON.stringify({ action: 'getMonthlySummary', pin: API_PIN }) 
+        });
+        const res = await response.json();
+        
+        if (res.status === 'success') {
+          renderMonthlySummary(res.data);
+        } else {
+          tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger py-4 fw-bold">❌ Error: ${res.message}</td></tr>`;
+        }
+      } catch (err) { 
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger py-4 fw-bold">❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้</td></tr>`; 
+      }
+    }
+
+    function renderMonthlySummary(data) {
+      const tbody = document.getElementById('monthly-summary-body');
+      if(!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-muted">ยังไม่มีข้อมูลยอดขายที่ยืนยันแล้ว</td></tr>';
+        return;
+      }
+      
+      let html = '';
+      const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+      
+      data.forEach(row => {
+        // แปลง "04/2569" เป็น "เมษายน 2569"
+        let parts = row.label.split('/');
+        let mIndex = parseInt(parts[0]) - 1;
+        let mName = (mIndex >= 0 && mIndex < 12) ? monthNames[mIndex] : parts[0];
+        let displayMonth = `${mName} ${parts[1]}`;
+        
+        html += `<tr>
+          <td class="fw-bold text-primary fs-6">${displayMonth}</td>
+          <td class="fw-bold text-secondary">${row.totalOrders} <small>บิล</small></td>
+          <td class="fw-bold text-success fs-5">${Number(row.totalSales).toLocaleString()}</td>
+          <td>${row.items[0]}</td>
+          <td>${row.items[1]}</td>
+          <td>${row.items[2]}</td>
+          <td>${row.items[3]}</td>
+          <td>${row.items[4]}</td>
+          <td>${row.items[5]}</td>
+        </tr>`;
+      });
+      tbody.innerHTML = html;
+    }
+    
   </script>
 </body>
 </html>
