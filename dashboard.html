@@ -259,27 +259,66 @@
       }
     }
 
+  // 🟢 ประกาศตัวแปรเก็บโหมดจัดเรียง (เพื่อป้องกัน Error)
+    var currentSortMode = 'deliver';
+
     // ----- ส่วนของรายการสั่งซื้อ -----
     async function loadData() {
       const tbody = document.getElementById('table-body');
       tbody.innerHTML = '<tr><td colspan="11" class="text-center py-4"><div class="spinner-border text-warning"></div> กำลังโหลดข้อมูล...</td></tr>';
       try {
-        const response = await fetch(WEB_APP_URL, { 
-          method: 'POST', 
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-          body: JSON.stringify({ action: 'getDashboardData', pin: API_PIN }) 
-        });
+        const response = await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'getDashboardData', pin: API_PIN }) });
         const res = await response.json();
         
         if (res.status === 'success') {
-          fetchedOrders = res.data; // เก็บข้อมูลต้นฉบับไว้
-          applySortAndRender(); // เรียกฟังก์ชันจัดเรียงและแสดงผล
+          globalOrders = res.data; // เก็บข้อมูลลงตัวแปรหลัก
+          applySortAndRender(); // ทำการจัดเรียงข้อมูล
         } else {
           tbody.innerHTML = `<tr><td colspan="11" class="text-center text-danger py-4 fw-bold">❌ Error: ${res.message}</td></tr>`;
         }
       } catch (err) { 
-        tbody.innerHTML = `<tr><td colspan="11" class="text-center text-danger py-4 fw-bold">❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้</td></tr>`; 
+        console.error("Data Load Error:", err);
+        // 🟢 เพิ่มการโชว์ err.message เพื่อให้รู้ว่าโค้ดพังที่บรรทัดไหน
+        tbody.innerHTML = `<tr><td colspan="11" class="text-center text-danger py-4 fw-bold">❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้<br><small class="text-muted">${err.message}</small></td></tr>`; 
       }
+    }
+
+    // 🟢 ฟังก์ชันจัดเรียงข้อมูลตามโหมดที่เลือก
+    function applySortAndRender() {
+      if (!globalOrders || globalOrders.length === 0) {
+        renderTable([]);
+        return;
+      }
+
+      // ฟังก์ชันแปลง วันที่/เวลา เป็นตัวเลข (YYYYMMDDHHmmss) เพื่อเปรียบเทียบ
+      const parseDateString = (dateStr, timeStr = '00:00') => {
+        try {
+          if (!dateStr || dateStr === '-') return 0;
+          const parts = String(dateStr).split(' ');
+          const dmy = parts[0].split('/'); 
+          if (dmy.length !== 3) return 0;
+          
+          let timeParts = ['00', '00', '00'];
+          const timeRaw = parts[1] ? parts[1] : timeStr;
+          if (timeRaw && timeRaw !== '-') {
+             const hm = String(timeRaw).split(':');
+             timeParts[0] = hm[0] || '00'; timeParts[1] = hm[1] || '00'; timeParts[2] = hm[2] || '00';
+          }
+          return parseInt(`${dmy[2]}${dmy[1]}${dmy[0]}${timeParts[0]}${timeParts[1]}${timeParts[2]}`);
+        } catch(e) {
+          return 0;
+        }
+      };
+
+      if (currentSortMode === 'order') {
+        // โหมด: เรียงตามเวลาสั่งซื้อ (เอาออเดอร์ล่าสุดขึ้นบน)
+        globalOrders.sort((a, b) => parseDateString(b.orderTime) - parseDateString(a.orderTime));
+      } else {
+        // โหมด: เรียงตามวันจัดส่งและเวลา (เอาคิวที่ใกล้ที่สุดขึ้นบน)
+        globalOrders.sort((a, b) => parseDateString(a.deliverDate, a.deliverTime) - parseDateString(b.deliverDate, b.deliverTime));
+      }
+
+      renderTable(globalOrders);
     }
 
     // 🟢 ฟังก์ชันสลับโหมดปุ่มกด
@@ -287,44 +326,48 @@
       const btnSort = document.getElementById('btn-sort');
       if (currentSortMode === 'deliver') {
         currentSortMode = 'order'; // เปลี่ยนไปเรียงตามออเดอร์ใหม่
-        btnSort.innerHTML = '<i class="fas fa-calendar-day"></i> เรียงจากวันจัดส่ง';
-        btnSort.classList.replace('btn-outline-primary', 'btn-outline-success');
+        if(btnSort) {
+          btnSort.innerHTML = '<i class="fas fa-calendar-day"></i> เรียงจากวันจัดส่ง';
+          btnSort.classList.replace('btn-outline-primary', 'btn-outline-success');
+        }
       } else {
         currentSortMode = 'deliver'; // กลับไปเรียงตามวันจัดส่ง
-        btnSort.innerHTML = '<i class="fas fa-sort-amount-down"></i> เรียงจากเวลาสั่งซื้อ';
-        btnSort.classList.replace('btn-outline-success', 'btn-outline-primary');
+        if(btnSort) {
+          btnSort.innerHTML = '<i class="fas fa-sort-amount-down"></i> เรียงจากเวลาสั่งซื้อ';
+          btnSort.classList.replace('btn-outline-success', 'btn-outline-primary');
+        }
       }
       applySortAndRender();
     }
 
-    // 🟢 ฟังก์ชันจัดเรียงข้อมูลตามโหมดที่เลือก
-    function applySortAndRender() {
-      let dataToSort = [...fetchedOrders]; // ก๊อปปี้ข้อมูลมาจัดเรียง
-
-      // ฟังก์ชันช่วยแปลง วันที่/เวลา เป็นตัวเลขเพื่อเปรียบเทียบ
-      const parseDateString = (dateStr, timeStr = '00:00') => {
-        if (!dateStr) return 0;
-        const dmy = dateStr.split(' ')[0].split('/'); 
-        if (dmy.length !== 3) return 0;
-        
-        let timeParts = ['00', '00', '00'];
-        const timeRaw = dateStr.includes(' ') ? dateStr.split(' ')[1] : timeStr;
-        if (timeRaw) {
-           const hm = timeRaw.split(':');
-           timeParts[0] = hm[0] || '00'; timeParts[1] = hm[1] || '00'; timeParts[2] = hm[2] || '00';
-        }
-        return parseInt(`${dmy[2]}${dmy[1]}${dmy[0]}${timeParts[0]}${timeParts[1]}${timeParts[2]}`);
-      };
-
-      if (currentSortMode === 'order') {
-        // โหมด: เรียงตามเวลาสั่งซื้อ (เอาออเดอร์ล่าสุดขึ้นบน)
-        dataToSort.sort((a, b) => parseDateString(b.orderTime) - parseDateString(a.orderTime));
-      } else {
-        // โหมด: เรียงตามวันจัดส่งและเวลา (เอาคิวที่ใกล้ที่สุดขึ้นบน)
-        dataToSort.sort((a, b) => parseDateString(a.deliverDate, a.deliverTime) - parseDateString(b.deliverDate, b.deliverTime));
+    function renderTable(data) {
+      globalOrders = data; let html = '';
+      if(data.length === 0) html = '<tr><td colspan="11" class="text-center text-muted py-4">ไม่มีออเดอร์ค้างส่ง</td></tr>';
+      else {
+        data.forEach((row, index) => {
+          let paidIcon = row.isPaid === "TRUE" 
+            ? '<i class="fas fa-check-circle text-success fs-4"></i>' 
+            : `<button class="btn btn-success btn-sm rounded-pill fw-bold shadow-sm px-3" onclick="confirmPayment(${index})"><i class="fas fa-check"></i> ยืนยัน</button>`;
+            
+          let statusClass = String(row.payment).includes('ยืนยัน') ? 'status-paid' : 'status-wait';
+          
+          html += `<tr>
+            <td class="small text-muted" style="white-space: nowrap;">${row.orderTime}</td>
+            <td class="fw-bold text-primary">${row.deliverDate}</td><td class="fw-bold">${row.deliverTime}</td>
+            <td>${row.lineId || '-'}</td><td>${row.custName}</td><td>${row.phone}</td>
+            <td><span class="badge bg-secondary">${row.deliverBy}</span></td><td class="${statusClass}">${row.payment}</td>
+            <td class="text-center">${paidIcon}</td><td class="small text-danger">${row.reconfirmStatus}</td>
+            <td class="text-center">
+              <div class="btn-group">
+                <button class="btn btn-outline-primary btn-sm shadow-sm" onclick="openDetail(${index})" title="ดูรายละเอียด"><i class="fas fa-search"></i></button>
+                <button class="btn btn-outline-info btn-sm shadow-sm" onclick="openEditModal(${index})" title="แก้ไขข้อมูล"><i class="fas fa-edit"></i></button>
+              </div>
+            </td>
+          </tr>`;
+        });
       }
-
-      renderTable(dataToSort); // ส่งข้อมูลที่เรียงแล้วไปแสดงผล
+      document.getElementById('table-body').innerHTML = html;
+      populateSumOrderDates();
     }
 
     // ----- การแก้ไขออเดอร์ -----
