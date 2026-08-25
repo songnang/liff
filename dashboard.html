@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📦 ร้านขนมเทียนสองนาง 1.12</title>
+  <title>📦 ร้านขนมเทียนสองนาง 1.13</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
@@ -26,7 +26,7 @@
   <div id="main-ui" style="display: none;">
     <nav class="navbar navbar-expand-lg navbar-dark p-3">
       <div class="container-fluid">
-        <a class="navbar-brand fw-bold" href="#"><i class="fas fa-store"></i> ร้านขนมเทียนสองนาง V 1.12</a>
+        <a class="navbar-brand fw-bold" href="#"><i class="fas fa-store"></i> ร้านขนมเทียนสองนาง V 1.13</a>
         <div class="d-flex align-items-center">
           <a href="manual.html" target="_blank" class="btn btn-light btn-sm fw-bold text-danger shadow-sm rounded-pill px-3"><i class="fas fa-book"></i> คู่มือการใช้งาน</a>
         </div>
@@ -110,6 +110,40 @@
               </table>
             </div>
           </div>
+
+          <!-- 🟢 Modal สรุปยอดขายรายวัน (ซ่อนอยู่ จะเด้งขึ้นมาเมื่อคลิกที่บรรทัดเดือน) -->
+          <div class="modal fade" id="dailyModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+              <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-success text-white border-0">
+                  <h5 class="modal-title fw-bold" id="dailyModalTitle"><i class="fas fa-calendar-day"></i> ยอดขายรายวัน</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 bg-light">
+                  <div class="table-responsive">
+                    <table class="table table-bordered align-middle text-center table-striped bg-white">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>วันที่รับของ</th>
+                          <th>จำนวนออเดอร์</th>
+                          <th>ยอดขายรวม (บาท)</th>
+                          <th>เทียนเค็ม</th>
+                          <th>เทียนหวาน</th>
+                          <th>เข่งธรรมดา(คู่)</th>
+                          <th>เข่งมะพร้าว(คู่)</th>
+                          <th>ข้าวต้มมัด(คู่)</th>
+                          <th>บะจ่าง</th>
+                        </tr>
+                      </thead>
+                      <tbody id="daily-summary-body">
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
         </div>
         
         <div class="tab-pane fade" id="pills-products" role="tabpanel">
@@ -637,22 +671,25 @@ async function loadSettings() {
       }
     }
 
-  // ==========================================
-    // 🟢 ระบบสรุปยอดขายประจำเดือน
     // ==========================================
+    // 🟢 ระบบสรุปยอดขายประจำเดือน และ รายวัน
+    // ==========================================
+    let monthlySummaryData = []; // เก็บข้อมูลเดือนไว้ใช้ตอนคลิกดูรายวัน
+    let dailyModalInstance;
+
     async function loadMonthlySummary() {
       const tbody = document.getElementById('monthly-summary-body');
       tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4"><div class="spinner-border text-primary"></div> กำลังดึงข้อมูลยอดขาย...</td></tr>';
       try {
         const response = await fetch(WEB_APP_URL, { 
-          method: 'POST', 
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+          method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
           body: JSON.stringify({ action: 'getMonthlySummary', pin: API_PIN }) 
         });
         const res = await response.json();
         
         if (res.status === 'success') {
-          renderMonthlySummary(res.data);
+          monthlySummaryData = res.data;
+          renderMonthlySummary(monthlySummaryData);
         } else {
           tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger py-4 fw-bold">❌ Error: ${res.message}</td></tr>`;
         }
@@ -671,26 +708,57 @@ async function loadSettings() {
       let html = '';
       const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
       
-      data.forEach(row => {
-        // แปลง "04/2569" เป็น "เมษายน 2569"
+      data.forEach((row, index) => {
         let parts = row.label.split('/');
         let mIndex = parseInt(parts[0]) - 1;
         let mName = (mIndex >= 0 && mIndex < 12) ? monthNames[mIndex] : parts[0];
         let displayMonth = `${mName} ${parts[1]}`;
         
-        html += `<tr>
-          <td class="fw-bold text-primary fs-6">${displayMonth}</td>
+        // 🟢 เพิ่ม event onclick ให้คลิกบรรทัดเพื่อดูรายละเอียดรายวัน
+        html += `<tr style="cursor: pointer; transition: 0.3s;" onmouseover="this.style.backgroundColor='#e8f4fd'" onmouseout="this.style.backgroundColor=''" onclick="viewDailySummary(${index})" title="คลิกเพื่อดูยอดขายรายวันของเดือนนี้">
+          <td class="fw-bold text-primary fs-6"><i class="fas fa-hand-pointer text-muted small me-2"></i> ${displayMonth}</td>
           <td class="fw-bold text-secondary">${row.totalOrders} <small>บิล</small></td>
           <td class="fw-bold text-success fs-5">${Number(row.totalSales).toLocaleString()}</td>
-          <td>${row.items[0]}</td>
-          <td>${row.items[1]}</td>
-          <td>${row.items[2]}</td>
-          <td>${row.items[3]}</td>
-          <td>${row.items[4]}</td>
-          <td>${row.items[5]}</td>
+          <td>${row.items[0]}</td><td>${row.items[1]}</td><td>${row.items[2]}</td>
+          <td>${row.items[3]}</td><td>${row.items[4]}</td><td>${row.items[5]}</td>
         </tr>`;
       });
       tbody.innerHTML = html;
+    }
+
+    // 🟢 ฟังก์ชันเปิด Modal แสดงข้อมูลรายวันของเดือนที่คลิก
+    function viewDailySummary(index) {
+      if(!dailyModalInstance) {
+        dailyModalInstance = new bootstrap.Modal(document.getElementById('dailyModal'));
+      }
+      
+      const monthData = monthlySummaryData[index];
+      const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+      let parts = monthData.label.split('/');
+      let mName = monthNames[parseInt(parts[0]) - 1] || parts[0];
+      
+      // เปลี่ยนหัวข้อ Modal
+      document.getElementById('dailyModalTitle').innerHTML = `<i class="fas fa-calendar-day"></i> ยอดขายรายวัน : ประจำเดือน ${mName} ${parts[1]}`;
+      
+      const tbody = document.getElementById('daily-summary-body');
+      let html = '';
+      
+      if(!monthData.dailyList || monthData.dailyList.length === 0) {
+        html = '<tr><td colspan="9" class="text-center py-4 text-muted">ไม่มีข้อมูล</td></tr>';
+      } else {
+        monthData.dailyList.forEach(day => {
+          html += `<tr>
+            <td class="fw-bold text-dark">${day.label}</td>
+            <td class="text-secondary">${day.totalOrders} <small>บิล</small></td>
+            <td class="fw-bold text-success">${Number(day.totalSales).toLocaleString()}</td>
+            <td>${day.items[0]}</td><td>${day.items[1]}</td><td>${day.items[2]}</td>
+            <td>${day.items[3]}</td><td>${day.items[4]}</td><td>${day.items[5]}</td>
+          </tr>`;
+        });
+      }
+      
+      tbody.innerHTML = html;
+      dailyModalInstance.show();
     }
     
   </script>
