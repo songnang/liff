@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📦 ร้านขนมเทียนสองนาง 1.16</title>
+  <title>📦 ร้านขนมเทียนสองนาง 1.17</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
@@ -26,7 +26,7 @@
   <div id="main-ui" style="display: none;">
     <nav class="navbar navbar-expand-lg navbar-dark p-3">
       <div class="container-fluid">
-        <a class="navbar-brand fw-bold" href="#"><i class="fas fa-store"></i> ร้านขนมเทียนสองนาง V 1.16</a>
+        <a class="navbar-brand fw-bold" href="#"><i class="fas fa-store"></i> ร้านขนมเทียนสองนาง V 1.17</a>
         <div class="d-flex align-items-center">
           <a href="manual.html" target="_blank" class="btn btn-light btn-sm fw-bold text-danger shadow-sm rounded-pill px-3"><i class="fas fa-book"></i> คู่มือการใช้งาน</a>
         </div>
@@ -46,18 +46,25 @@
         <div class="tab-pane fade show active" id="pills-orders" role="tabpanel">
           <div class="card card-dashboard p-3">
             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-              <h5 class="fw-bold text-dark m-0"><i class="fas fa-list text-warning"></i> ออเดอร์ที่ต้องจัดส่ง (ตั้งแต่วันนี้)</h5>
+              <!-- 🟢 เพิ่ม id="table-heading" เพื่อให้เปลี่ยนข้อความตามโหมดได้ -->
+              <h5 id="table-heading" class="fw-bold text-dark m-0"><i class="fas fa-list text-warning"></i> ออเดอร์ที่ต้องจัดส่ง (ตั้งแต่วันนี้)</h5>
+              
               <div class="d-flex align-items-center flex-wrap gap-2">
-                <!-- 🟢 กล่องค้นหาประวัติลูกค้า -->
                 <div class="input-group input-group-sm shadow-sm" style="max-width: 250px;">
                   <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                   <input type="text" id="search-history-input" class="form-control border-start-0 ps-0" placeholder="ค้นหาชื่อ หรือ เบอร์โทร..." onkeypress="if(event.key === 'Enter') searchHistory()">
                   <button class="btn btn-primary fw-bold" type="button" onclick="searchHistory()">ค้นหา</button>
                 </div>
                 
+                <!-- 🟢 เพิ่มปุ่มสลับดูออเดอร์ย้อนหลัง -->
+                <button id="btn-filter" class="btn btn-outline-secondary btn-sm fw-bold shadow-sm" onclick="toggleFilterMode()">
+                  <i class="fas fa-history"></i> ดูออเดอร์ย้อนหลัง
+                </button>
+                
                 <button id="btn-sort" class="btn btn-outline-primary btn-sm fw-bold shadow-sm" onclick="toggleSortMode()">
                   <i class="fas fa-sort-amount-down"></i> เรียงจากเวลาสั่งซื้อ
                 </button>
+                
                 <button class="btn btn-outline-secondary btn-sm fw-bold shadow-sm" onclick="loadData()">
                   <i class="fas fa-sync-alt"></i> รีเฟรช
                 </button>
@@ -330,7 +337,11 @@
       }
     }
 
-    // ----- ส่วนของรายการสั่งซื้อ -----
+    // 🟢 ประกาศตัวแปรเก็บสถานะการทำงาน
+    let masterOrders = []; // เก็บข้อมูลดั้งเดิมทั้งหมด
+    let currentFilterMode = 'upcoming'; // โหมดคัดกรอง (upcoming = วันนี้เป็นต้นไป, past = ย้อนหลัง)
+    
+    // ----- ส่วนของการดึงข้อมูล -----
     async function loadData() {
       const tbody = document.getElementById('table-body');
       tbody.innerHTML = '<tr><td colspan="11" class="text-center py-4"><div class="spinner-border text-warning"></div> กำลังโหลดข้อมูล...</td></tr>';
@@ -339,26 +350,52 @@
         const res = await response.json();
         
         if (res.status === 'success') {
-          globalOrders = res.data; // เก็บข้อมูลลงตัวแปรหลัก
-          applySortAndRender(); // ทำการจัดเรียงข้อมูล
+          masterOrders = res.data; // 🟢 เซฟลง master ก่อนเพื่อไม่ให้ข้อมูลหายตอนฟิลเตอร์
+          applySortAndRender(); 
         } else {
           tbody.innerHTML = `<tr><td colspan="11" class="text-center text-danger py-4 fw-bold">❌ Error: ${res.message}</td></tr>`;
         }
       } catch (err) { 
-        console.error("Data Load Error:", err);
-        // 🟢 เพิ่มการโชว์ err.message เพื่อให้รู้ว่าโค้ดพังที่บรรทัดไหน
-        tbody.innerHTML = `<tr><td colspan="11" class="text-center text-danger py-4 fw-bold">❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้<br><small class="text-muted">${err.message}</small></td></tr>`; 
+        console.error(err);
+        tbody.innerHTML = `<tr><td colspan="11" class="text-center text-danger py-4 fw-bold">❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้</td></tr>`; 
       }
     }
 
-    // 🟢 ฟังก์ชันจัดเรียงข้อมูลตามโหมดที่เลือก
+    // 🟢 ฟังก์ชันสลับโหมดคัดกรอง (แสดงออเดอร์เก่า/ใหม่)
+    function toggleFilterMode() {
+      const btnFilter = document.getElementById('btn-filter');
+      const tableHeading = document.getElementById('table-heading');
+      
+      if (currentFilterMode === 'upcoming') {
+        currentFilterMode = 'past'; // เปลี่ยนไปดูของเก่า
+        if(btnFilter) {
+          btnFilter.innerHTML = '<i class="fas fa-truck"></i> ดูคิวจัดส่งปัจจุบัน';
+          btnFilter.classList.replace('btn-outline-secondary', 'btn-outline-danger');
+        }
+        if(tableHeading) {
+          tableHeading.innerHTML = '<i class="fas fa-history text-danger"></i> ประวัติออเดอร์ย้อนหลัง (ก่อนวันนี้)';
+        }
+      } else {
+        currentFilterMode = 'upcoming'; // กลับมาดูคิวปัจจุบัน
+        if(btnFilter) {
+          btnFilter.innerHTML = '<i class="fas fa-history"></i> ดูออเดอร์ย้อนหลัง';
+          btnFilter.classList.replace('btn-outline-danger', 'btn-outline-secondary');
+        }
+        if(tableHeading) {
+          tableHeading.innerHTML = '<i class="fas fa-list text-warning"></i> ออเดอร์ที่ต้องจัดส่ง (ตั้งแต่วันนี้)';
+        }
+      }
+      applySortAndRender();
+    }
+
+    // 🟢 ฟังก์ชันจัดเรียงและคัดกรองข้อมูล
     function applySortAndRender() {
-      if (!globalOrders || globalOrders.length === 0) {
+      if (!masterOrders || masterOrders.length === 0) {
         renderTable([]);
         return;
       }
 
-      // ฟังก์ชันแปลง วันที่/เวลา เป็นตัวเลข (YYYYMMDDHHmmss) เพื่อเปรียบเทียบ
+      // ฟังก์ชันแปลง วันที่/เวลา เป็นตัวเลข (YYYYMMDDHHmmss)
       const parseDateString = (dateStr, timeStr = '00:00') => {
         try {
           if (!dateStr || dateStr === '-') return 0;
@@ -378,15 +415,41 @@
         }
       };
 
+      // 🟢 หาวันที่ปัจจุบัน (แปลงเป็นรูปแบบ YYYYMMDD000000)
+      const today = new Date();
+      const yearBE = today.getFullYear() + 543;
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      const todayInt = parseInt(`${yearBE}${month}${day}000000`);
+
+      // 🟢 1. คัดกรองข้อมูลตามโหมด
+      let filteredData = masterOrders.filter(row => {
+        const rowDateInt = parseDateString(row.deliverDate);
+        if (currentFilterMode === 'past') {
+           // โหมดดูย้อนหลัง: แสดงเฉพาะออเดอร์ที่วันจัดส่ง "น้อยกว่า" วันนี้
+           return rowDateInt < todayInt && rowDateInt > 0;
+        } else {
+           // โหมดปัจจุบัน: แสดงเฉพาะออเดอร์ที่วันจัดส่ง "มากกว่าหรือเท่ากับ" วันนี้
+           return rowDateInt >= todayInt || rowDateInt === 0;
+        }
+      });
+
+      // 🟢 2. จัดเรียงข้อมูล
       if (currentSortMode === 'order') {
-        // โหมด: เรียงตามเวลาสั่งซื้อ (เอาออเดอร์ล่าสุดขึ้นบน)
-        globalOrders.sort((a, b) => parseDateString(b.orderTime) - parseDateString(a.orderTime));
+        // เรียงตามเวลาสั่งซื้อล่าสุด
+        filteredData.sort((a, b) => parseDateString(b.orderTime) - parseDateString(a.orderTime));
       } else {
-        // โหมด: เรียงตามวันจัดส่งและเวลา (เอาคิวที่ใกล้ที่สุดขึ้นบน)
-        globalOrders.sort((a, b) => parseDateString(a.deliverDate, a.deliverTime) - parseDateString(b.deliverDate, b.deliverTime));
+        if (currentFilterMode === 'past') {
+            // ประวัติย้อนหลัง: เอาวันที่ใหม่ที่สุดขึ้นก่อน (เช่น เมื่อวาน อยู่บนสุด)
+            filteredData.sort((a, b) => parseDateString(b.deliverDate, b.deliverTime) - parseDateString(a.deliverDate, a.deliverTime));
+        } else {
+            // คิวปัจจุบัน: เอาคิวที่ใกล้ถึงที่สุดขึ้นก่อน (เช่น วันนี้ อยู่บนสุด)
+            filteredData.sort((a, b) => parseDateString(a.deliverDate, a.deliverTime) - parseDateString(b.deliverDate, b.deliverTime));
+        }
       }
 
-      renderTable(globalOrders);
+      // ส่งข้อมูลที่กรองแล้วไปสร้างตาราง
+      renderTable(filteredData);
     }
 
     // 🟢 ฟังก์ชันสลับโหมดปุ่มกด
@@ -410,7 +473,14 @@
 
     function renderTable(data) {
       globalOrders = data; let html = '';
-      if(data.length === 0) html = '<tr><td colspan="11" class="text-center text-muted py-4">ไม่มีออเดอร์ค้างส่ง</td></tr>';
+      
+      if(data.length === 0) {
+        // 🟢 เปลี่ยนข้อความให้ตรงกับโหมดที่กำลังดูอยู่ (อดีต vs ปัจจุบัน)
+        let emptyMessage = (typeof currentFilterMode !== 'undefined' && currentFilterMode === 'past') 
+                           ? '<i class="fas fa-history text-muted fs-3 mb-2 d-block"></i> ไม่มีประวัติออเดอร์ย้อนหลัง' 
+                           : '<i class="fas fa-box-open text-muted fs-3 mb-2 d-block"></i> ไม่มีออเดอร์ค้างส่ง';
+        html = `<tr><td colspan="11" class="text-center text-muted py-5">${emptyMessage}</td></tr>`;
+      }
       else {
         data.forEach((row, index) => {
           let paidIcon = row.isPaid === "TRUE" 
@@ -435,7 +505,8 @@
         });
       }
       document.getElementById('table-body').innerHTML = html;
-      populateSumOrderDates();
+      
+      if (typeof populateSumOrderDates === "function") populateSumOrderDates();
     }
 
     // ----- การแก้ไขออเดอร์ -----
