@@ -90,7 +90,7 @@
             </div>
             <div class="table-responsive" id="sumorder-table-container">
               <table class="table table-bordered align-middle text-center table-striped">
-                <thead class="table-warning border-dark"><tr><th width="12%">เวลาจัดส่ง</th><th width="15%">ช่องทางรับ</th><th>เทียนเค็ม</th><th>เทียนหวาน</th><th>เข่งธรรมดา(คู่)</th><th>เข่งมะพร้าว(คู่)</th><th>ข้าวต้มมัด(คู่)</th><th>บะจ่าง</th></tr></thead>
+                <thead class="table-warning border-dark"><tr><th width="12%">เวลาจัดส่ง</th><th width="15%">ช่องทางรับ</th><th>เทียนเค็ม</th><th>เทียนหวาน</th><th>เข่งธรรมดา(คู่)</th><th>เข่งมะพร้าว(คู่)</th><th>ข้าวต้มมัด(มัด)</th><th>บะจ่าง</th></tr></thead>
                 <tbody id="sumorder-body"><tr><td colspan="8" class="text-center py-4 text-muted">กรุณารอโหลดข้อมูล...</td></tr></tbody>
               </table>
             </div>
@@ -113,7 +113,7 @@
                     <th>เทียนหวาน</th>
                     <th>เข่งธรรมดา(คู่)</th>
                     <th>เข่งมะพร้าว(คู่)</th>
-                    <th>ข้าวต้มมัด(คู่)</th>
+                    <th>ข้าวต้มมัด(มัด)</th>
                     <th>บะจ่าง</th>
                   </tr>
                 </thead>
@@ -144,7 +144,7 @@
                           <th>เทียนหวาน</th>
                           <th>เข่งธรรมดา(คู่)</th>
                           <th>เข่งมะพร้าว(คู่)</th>
-                          <th>ข้าวต้มมัด(คู่)</th>
+                          <th>ข้าวต้มมัด(มัด)</th>
                           <th>บะจ่าง</th>
                         </tr>
                       </thead>
@@ -578,7 +578,7 @@
     function openDetail(index) {
       const order = globalOrders[index];
       const products = ['เทียนเค็ม', 'เทียนหวาน', 'เข่งธรรมดา', 'เข่งมะพร้าว', 'ข้าวต้มมัด', 'บะจ่าง'];
-      const units = ['ลูก', 'ลูก', 'คู่', 'คู่', 'คู่', 'ลูก'];
+      const units = ['ลูก', 'ลูก', 'คู่', 'คู่', 'มัด', 'ลูก'];
       let itemsHtml = '';
       order.items.forEach((qty, i) => { if(qty > 0) itemsHtml += `<div class="d-flex justify-content-between border-bottom py-1"><span>${products[i]}</span> <strong>${qty} ${units[i]}</strong></div>`; });
 
@@ -914,7 +914,7 @@ async function loadSettings() {
        } else {
           let html = '';
           const productNames = ['เทียนเค็ม', 'เทียนหวาน', 'เข่งธรรมดา', 'เข่งมะพร้าว', 'ข้าวต้มมัด', 'บะจ่าง'];
-          const units = ['ลูก', 'ลูก', 'คู่', 'คู่', 'คู่', 'ลูก'];
+          const units = ['ลูก', 'ลูก', 'คู่', 'คู่', 'มัด', 'ลูก'];
 
           data.forEach(row => {
              // 🟢 ประมวลผลรายการสินค้า
